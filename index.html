@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<!--
+  ═══════════════════════════════════════════════════════════════════
+  YDT READING LAB — tek dosyalık statik site (harici bağımlılık yok)
+  GITHUB + NETLIFY DAĞITIMI:
+    1) Bu dosyayı bir GitHub deposuna "index.html" adıyla yükleyin.
+    2) Netlify → "Add new site" → "Import an existing project" ile
+       repo'yu bağlayın (Build command: yok / Publish directory: .)
+       YA DA "Deploy manually" seçeneğiyle dosyayı sürükleyip bırakın.
+    3) Site otomatik olarak index.html'i sunar. Yapılandırma gerekmez.
+  Not: 15 soruluk denemenin şık dağılımı, kaynaktaki 100 soruluk
+  cevap anahtarının ilk 15 satırıyla (E D C B D C B A C D E B B C E)
+  uyumludur.
+  ═══════════════════════════════════════════════════════════════════
+-->
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YDT Reading Lab — Soru Kökleri, Stratejiler ve Özgün Deneme</title>
+<meta name="description" content="YDT/YDS/YÖKDİL Reading için soru kökü anatomisi, 6 beceri dersi, soru kökü simülatörü ve her soruda geniş çeldirici dökümü sunan interaktif çalışma atölyesi.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..800&family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F7F2E5; --card:#FCFAF2; --paper2:#EFE8D5;
+    --ink:#211B12; --ink2:#6A5F4C; --line:#D9CFB8;
+    --ok:#1E7A3E; --okbg:#E4F1E4; --bad:#C22B1E; --badbg:#F7E4E0;
+    --hl:#F6DA49;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:'Bricolage Grotesque',system-ui,sans-serif;
+    font-size:16px; line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+  .serif{font-family:'Newsreader',Georgia,serif}
+  a{color:inherit}
+  .ic{width:1em;height:1em;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-0.12em;flex:none}
+
+  /* ---------- Üst bar ---------- */
+  .topbar{position:sticky;top:0;z-index:60;background:var(--paper);border-bottom:2px solid var(--ink)}
+  .topbar .wrap{display:flex;align-items:center;justify-content:space-between;gap:14px;height:58px}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:800;letter-spacing:.04em;font-size:.95rem;white-space:nowrap}
+  .brand svg{width:30px;height:30px;flex:none}
+  .brand .sub{font-family:'Newsreader',serif;font-style:italic;font-weight:500;color:var(--ink2);letter-spacing:0;margin-left:2px}
+  .topnav{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+  .topnav::-webkit-scrollbar{display:none}
+  .topnav a{text-decoration:none;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:6px 10px;border-bottom:2px solid transparent;white-space:nowrap}
+  .topnav a:hover{background:var(--paper2)}
+  .topnav a.on{border-bottom-color:var(--ink)}
+
+  /* ---------- Masthead + Hero ---------- */
+  .mast{border-bottom:2px solid var(--ink);padding:8px 0}
+  .mast .wrap{display:flex;justify-content:space-between;gap:12px;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:var(--ink2)}
+  .hero{padding:54px 0 30px;position:relative}
+  .hero .wrap{display:grid;grid-template-columns:1.15fr .85fr;gap:48px;align-items:center}
+  .hero-kicker{font-size:.75rem;font-weight:800;text-transform:uppercase;letter-spacing:.22em;color:var(--bad);margin-bottom:14px}
+  h1.big{font-weight:800;font-size:clamp(2.6rem,6.2vw,4.6rem);line-height:.98;letter-spacing:-.015em;text-transform:uppercase}
+  h1.big .mark{background:var(--hl);box-shadow:.14em 0 0 var(--hl),-.14em 0 0 var(--hl)}
+  h1.big .serif{display:block;font-weight:500;font-style:italic;text-transform:none;font-size:.62em;letter-spacing:0;margin-top:.18em;color:var(--ink)}
+  .hero-lead{font-family:'Newsreader',serif;font-size:1.15rem;color:var(--ink2);max-width:52ch;margin:22px 0 26px}
+  .hero-lead b{color:var(--ink)}
+  .cta-row{display:flex;gap:12px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:9px;font-family:inherit;font-weight:700;font-size:.85rem;letter-spacing:.05em;text-transform:uppercase;padding:12px 20px;border:2px solid var(--ink);background:var(--ink);color:var(--paper);cursor:pointer;text-decoration:none;box-shadow:4px 4px 0 rgba(33,27,18,.35);transition:transform .12s,box-shadow .12s}
+  .btn:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 rgba(33,27,18,.35)}
+  .btn.ghost{background:var(--card);color:var(--ink)}
+  .btn.small{padding:8px 14px;font-size:.72rem;box-shadow:3px 3px 0 rgba(33,27,18,.3)}
+  .hero-badges{display:flex;gap:18px;margin-top:28px;flex-wrap:wrap}
+  .hb{border-top:2px solid var(--ink);padding-top:6px;min-width:74px}
+  .hb b{display:block;font-size:1.35rem;font-weight:800}
+  .hb span{font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink2)}
+
+  /* Hero kök kartları yığını */
+  .stack{position:relative;height:330px}
+  .stackcard{position:absolute;width:88%;background:var(--card);border:2px solid var(--ink);box-shadow:6px 6px 0 rgba(33,27,18,.28);padding:16px 18px 14px}
+  .stackcard .tag{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.16em;color:#FCFAF2;background:var(--c);display:inline-block;padding:3px 8px;margin-bottom:9px}
+  .stackcard p{font-family:'Newsreader',serif;font-style:italic;font-size:1.02rem;line-height:1.35}
+  .stackcard small{display:block;font-family:'Bricolage Grotesque',sans-serif;font-style:normal;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--ink2);margin-top:8px}
+  .stackcard:nth-child(1){right:0;top:0;transform:rotate(-3.2deg);border-left:6px solid var(--c)}
+  .stackcard:nth-child(2){left:0;top:112px;transform:rotate(1.8deg);border-left:6px solid var(--c);z-index:2}
+  .stackcard:nth-child(3){right:6%;top:224px;transform:rotate(-1.4deg);border-left:6px solid var(--c);z-index:3}
+  .stamp{position:absolute;right:-6px;top:-24px;width:128px;height:128px;z-index:5;transform:rotate(-12deg);pointer-events:none;color:var(--bad);opacity:.85}
+
+  /* ---------- Beceri şeridi listesi ---------- */
+  .strips{border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);background:var(--card)}
+  .strip{display:grid;grid-template-columns:64px 210px 1fr 60px;align-items:center;gap:14px;padding:11px 0;border-bottom:1px solid var(--line);cursor:pointer;background:transparent;transition:background .15s}
+  .strip:last-child{border-bottom:none}
+  .strip:hover{background:var(--paper2)}
+  .strip .num{font-weight:800;font-size:1.3rem;color:var(--c);border-right:3px solid var(--c);padding-right:12px}
+  .strip .nm b{display:block;font-weight:800;font-size:.95rem}
+  .strip .nm span{font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink2)}
+  .strip .ex{font-family:'Newsreader',serif;font-style:italic;color:var(--ink2);font-size:.95rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .strip .cnt{text-align:right;font-weight:800;font-size:.8rem;color:var(--c);white-space:nowrap}
+
+  /* ---------- Bölüm başlıkları ---------- */
+  section{padding:64px 0 20px}
+  .sec-head{display:flex;align-items:baseline;gap:16px;border-bottom:3px solid var(--ink);padding-bottom:14px;margin-bottom:30px;flex-wrap:wrap}
+  .sec-head .no{font-family:'Newsreader',serif;font-style:italic;font-size:1.15rem;color:var(--ink2)}
+  .sec-head h2{font-size:clamp(1.6rem,3.4vw,2.3rem);font-weight:800;letter-spacing:-.01em;text-transform:uppercase}
+  .sec-head .d{margin-left:auto;font-size:.85rem;color:var(--ink2);max-width:38ch}
+
+  /* ---------- Dersler (akordeon) ---------- */
+  .lesson{border:2px solid var(--ink);background:var(--card);margin-bottom:16px;box-shadow:5px 5px 0 rgba(33,27,18,.18)}
+  .lesson.open{box-shadow:8px 8px 0 rgba(33,27,18,.22)}
+  .lesson-h{display:grid;grid-template-columns:70px 1fr 40px;align-items:center;gap:10px;padding:0;cursor:pointer;border:none;background:transparent;font-family:inherit;width:100%;text-align:left}
+  .lesson-h .cbar{align-self:stretch;display:flex;align-items:center;justify-content:center;color:var(--c);font-weight:800;font-size:1.35rem;background:color-mix(in srgb,var(--c) 12%,transparent);border-right:3px solid var(--c)}
+  .lesson-h .tts{padding:14px 6px}
+  .lesson-h .tts b{display:block;font-size:1.12rem;font-weight:800}
+  .lesson-h .tts span{font-size:.7rem;text-transform:uppercase;letter-spacing:.12em;color:var(--ink2)}
+  .lesson-h .chev{color:var(--ink2);display:flex;justify-content:center;transition:transform .2s}
+  .lesson.open .chev{transform:rotate(180deg)}
+  .lesson-b{display:none;padding:22px;border-top:2px solid var(--line)}
+  .lesson.open .lesson-b{display:block}
+  .lesson-b .grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+  .roots-t{width:100%;border-collapse:collapse;font-size:.9rem}
+  .roots-t td{border:1px solid var(--line);padding:8px 12px;vertical-align:top}
+  .roots-t td:first-child{font-family:'Newsreader',serif;font-style:italic;font-size:.95rem;width:52%;background:color-mix(in srgb,var(--c) 6%,transparent)}
+  .roots-t td:last-child{color:var(--ink2);font-size:.82rem}
+  .h-mini{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.16em;color:var(--c);margin:0 0 8px}
+  .steps{list-style:none;counter-reset:st}
+  .steps li{counter-increment:st;position:relative;padding-left:34px;margin-bottom:12px;font-size:.92rem}
+  .steps li::before{content:counter(st);position:absolute;left:0;top:1px;width:22px;height:22px;border:2px solid var(--c);color:var(--c);font-weight:800;font-size:.75rem;display:flex;align-items:center;justify-content:center}
+  .trapbox{border:2px dashed var(--c);background:color-mix(in srgb,var(--c) 7%,transparent);padding:14px 16px;margin-top:16px;font-size:.88rem}
+  .trapbox b{color:var(--c);text-transform:uppercase;letter-spacing:.1em;font-size:.7rem;display:block;margin-bottom:5px}
+
+  /* Modal ölçer */
+  .modalmod{border:2px solid var(--ink);background:var(--card);box-shadow:8px 8px 0 rgba(33,27,18,.18);padding:26px;margin-top:30px}
+  .modalmod table{width:100%;border-collapse:collapse;font-size:.9rem;margin:14px 0 16px}
+  .modalmod th{background:var(--ink);color:var(--paper);text-align:left;padding:8px 12px;font-size:.7rem;text-transform:uppercase;letter-spacing:.12em}
+  .modalmod td{border:1px solid var(--line);padding:9px 12px;vertical-align:top}
+  .modalmod td:first-child{font-weight:800;white-space:nowrap}
+  .exbox{background:var(--paper2);border-left:4px solid var(--ink);padding:12px 16px;font-family:'Newsreader',serif;font-style:italic;font-size:.95rem}
+
+  /* ---------- Kök Lab ---------- */
+  #koklab .lab{background:var(--paper2);border:2px solid var(--ink);padding:30px;box-shadow:8px 8px 0 rgba(33,27,18,.18)}
+  .lab-grid{display:grid;grid-template-columns:1.4fr .6fr;gap:26px}
+  .rootcard{background:var(--card);border:2px solid var(--ink);box-shadow:6px 6px 0 rgba(33,27,18,.25);padding:26px;min-height:150px}
+  .rootcard .lbl{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.18em;color:var(--ink2);margin-bottom:10px}
+  .rootcard .root{font-family:'Newsreader',serif;font-style:italic;font-size:1.45rem;line-height:1.3}
+  .rootcard .tr{font-size:.85rem;color:var(--ink2);margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
+  .catbtns{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:18px}
+  .catb{font-family:inherit;font-weight:700;font-size:.78rem;padding:10px 6px;border:2px solid var(--c);background:color-mix(in srgb,var(--c) 8%,transparent);color:var(--ink);cursor:pointer;transition:background .12s,transform .12s}
+  .catb:hover{background:var(--c);color:var(--card);transform:translateY(-2px)}
+  .catb.wasright{background:var(--c);color:var(--card)}
+  .catb.waswrong{background:var(--bad);border-color:var(--bad);color:var(--card)}
+  .simfb{margin-top:16px;border-top:2px solid var(--line);padding-top:14px;font-size:.9rem;display:none}
+  .simfb.show{display:block}
+  .simfb .verdict{font-weight:800;font-size:.7rem;text-transform:uppercase;letter-spacing:.14em;margin-bottom:6px}
+  .simfb .verdict.ok{color:var(--ok)} .simfb .verdict.no{color:var(--bad)}
+  .simside{display:flex;flex-direction:column;gap:12px}
+  .simstat{background:var(--card);border:2px solid var(--ink);padding:14px 16px}
+  .simstat b{font-size:1.7rem;font-weight:800;display:block;line-height:1.1}
+  .simstat span{font-size:.66rem;text-transform:uppercase;letter-spacing:.12em;color:var(--ink2)}
+
+  /* ---------- Deneme ---------- */
+  .legend{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:26px}
+  .chip{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--card);background:var(--c);padding:4px 10px}
+  .footnote{font-size:.78rem;color:var(--ink2);font-style:italic;font-family:'Newsreader',serif;margin-top:10px}
+  .pcard{background:var(--card);border:2px solid var(--ink);box-shadow:8px 8px 0 rgba(33,27,18,.2);margin-bottom:36px}
+  .pcard-h{border-bottom:2px solid var(--ink);padding:16px 22px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+  .pcard-h .pno{font-size:.62rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--paper);background:var(--ink);padding:3px 9px}
+  .pcard-h h3{font-family:'Newsreader',serif;font-weight:600;font-size:1.35rem}
+  .pcard-h .pmeta{margin-left:auto;font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink2)}
+  .ptext{padding:24px 26px;font-family:'Newsreader',serif;font-size:1.05rem;line-height:1.75;color:#2c241a}
+  @media(min-width:900px){.ptext{columns:2;column-gap:2.4rem;column-rule:1px solid var(--line)}}
+  .ptext p{margin-bottom:1em;break-inside:avoid-column}
+  .ptext p:last-child{margin-bottom:0}
+  .sent{box-decoration-break:clone;-webkit-box-decoration-break:clone;padding:1px 0;transition:background .3s}
+  .sent.evid{background:var(--hl);box-shadow:.28em 0 0 var(--hl),-.28em 0 0 var(--hl);border-radius:1px}
+
+  .qcard{border:2px solid var(--ink);background:var(--card);box-shadow:5px 5px 0 rgba(33,27,18,.15);padding:20px 22px;margin:18px 0}
+  .qtop{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+  .qtop .chip{background:var(--c)}
+  .qtop .qn{font-size:.7rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink2)}
+  .qtop .pts{margin-left:auto;font-size:.66rem;color:var(--ink2);font-style:italic;font-family:'Newsreader',serif}
+  .stem{font-family:'Newsreader',serif;font-size:1.18rem;line-height:1.45;margin-bottom:16px}
+  .stem .kw{font-style:normal;font-family:'Bricolage Grotesque',sans-serif;font-weight:700;text-decoration:underline;text-decoration-color:var(--c);text-decoration-thickness:2.5px;text-underline-offset:4px}
+  .opts{display:flex;flex-direction:column;gap:8px}
+  .opt{display:grid;grid-template-columns:34px 1fr 26px;align-items:start;gap:12px;padding:10px 12px;border:1.5px solid var(--line);background:var(--paper);cursor:pointer;font-family:inherit;font-size:.95rem;text-align:left;transition:border-color .12s,background .12s;width:100%;color:var(--ink)}
+  .qcard:not(.answered) .opt:hover{border-color:var(--ink);background:var(--paper2)}
+  .opt .key{font-weight:800;border:1.5px solid var(--ink);width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:.8rem;background:var(--card);flex:none}
+  .opt .mk{display:flex;justify-content:center;align-items:center;color:transparent}
+  .answered .opt{cursor:default}
+  .answered .opt.correct{border:2px solid var(--ok);background:var(--okbg)}
+  .answered .opt.correct .key{background:var(--ok);color:#fff;border-color:var(--ok)}
+  .answered .opt.correct .mk{color:var(--ok)}
+  .answered .opt.wrongpick{border:2px solid var(--bad);background:var(--badbg)}
+  .answered .opt.wrongpick .key{background:var(--bad);color:#fff;border-color:var(--bad)}
+  .answered .opt.wrongpick .mk{color:var(--bad)}
+
+  .fb{display:none;margin-top:18px;border:2px solid var(--ink)}
+  .fb.show{display:block}
+  .fb-h{display:flex;align-items:center;gap:10px;color:#fff;font-weight:800;letter-spacing:.08em;text-transform:uppercase;font-size:.8rem;padding:10px 16px}
+  .fb-h.ok{background:var(--ok)} .fb-h.no{background:var(--bad)}
+  .fb-b{padding:18px;background:var(--card)}
+  .fb-b h4{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.16em;color:var(--ink2);margin:18px 0 7px}
+  .fb-b h4:first-child{margin-top:0}
+  .fb-b h4 b{color:var(--ink)}
+  .fb-p{font-size:.93rem}
+  .fb-p .ucat{color:var(--bad);font-weight:700}
+  .evq{border-left:4px solid var(--c);background:color-mix(in srgb,var(--c) 7%,transparent);padding:12px 16px;font-family:'Newsreader',serif;font-style:italic;font-size:.98rem;margin:8px 0}
+  .dump{list-style:none;border:1px solid var(--line)}
+  .dump li{display:grid;grid-template-columns:30px 1fr;gap:10px;padding:9px 12px;border-bottom:1px solid var(--line);font-size:.88rem}
+  .dump li:last-child{border-bottom:none}
+  .dump .k{font-weight:800}
+  .dump li.okr{background:var(--okbg)} .dump li.okr .k{color:var(--ok)}
+  .dump li.mine{background:var(--badbg)} .dump li.mine .k{color:var(--bad)}
+  .fb-duo{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+  .fb-box{border:1.5px solid var(--line);padding:12px 14px;font-size:.87rem}
+  .fb-box.tint{border-color:var(--c);background:color-mix(in srgb,var(--c) 7%,transparent)}
+  .fb-box b{display:block;font-size:.66rem;text-transform:uppercase;letter-spacing:.14em;color:var(--c);margin-bottom:5px}
+  .fb-act{margin-top:16px}
+
+  /* ---------- Karne ---------- */
+  .bignum-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
+  .bignum{border:2px solid var(--ink);background:var(--card);box-shadow:6px 6px 0 rgba(33,27,18,.18);padding:18px;text-align:center}
+  .bignum b{display:block;font-size:2.4rem;font-weight:800;line-height:1}
+  .bignum span{font-size:.66rem;text-transform:uppercase;letter-spacing:.14em;color:var(--ink2)}
+  .catbar{display:grid;grid-template-columns:210px 1fr 90px;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+  .catbar .nm{font-weight:800;font-size:.88rem}
+  .catbar .nm span{display:block;font-weight:500;font-size:.66rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink2)}
+  .catbar .track{height:16px;border:1.5px solid var(--ink);background:var(--paper2);position:relative}
+  .catbar .fill{position:absolute;inset:0;width:0;background:var(--c);transition:width .5s}
+  .catbar .sc{text-align:right;font-weight:800;font-size:.85rem}
+  .report-msg{margin:22px 0;font-size:.95rem;border-left:4px solid var(--ink);padding:10px 16px;background:var(--card)}
+  .reset-row{margin-top:8px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .confirmbox{display:none;gap:10px;align-items:center}
+  .confirmbox.show{display:flex}
+
+  /* ---------- Footer ---------- */
+  footer{margin-top:70px;background:var(--ink);color:var(--paper);padding:44px 0 34px}
+  footer .wrap{display:grid;grid-template-columns:1.2fr .8fr;gap:44px}
+  footer h5{font-size:.68rem;text-transform:uppercase;letter-spacing:.2em;color:#C9BFA8;margin-bottom:12px}
+  footer p{font-size:.86rem;color:#DDD4C0;line-height:1.7}
+  footer .fl{font-family:'Newsreader',serif;font-style:italic}
+  .deploy{border:1.5px solid #4A4335;padding:18px}
+  .deploy ol{margin:10px 0 0 18px;font-size:.84rem;color:#DDD4C0}
+  .deploy li{margin-bottom:8px}
+  .deploy code{background:#31291C;padding:2px 7px;font-size:.8rem;border:1px solid #4A4335}
+  .footrow{border-top:1px solid #4A4335;margin-top:34px;padding-top:16px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:.72rem;color:#B7AD97;letter-spacing:.05em}
+
+  /* Toast */
+  .toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,80px);background:var(--ink);color:var(--paper);padding:11px 22px;font-size:.82rem;font-weight:700;letter-spacing:.05em;box-shadow:5px 5px 0 rgba(0,0,0,.3);opacity:0;transition:transform .3s,opacity .3s;z-index:99;pointer-events:none}
+  .toast.show{transform:translate(-50%,0);opacity:1}
+
+  .reveal{opacity:0;transform:translateY(18px);transition:opacity .55s,transform .55s}
+  .reveal.in{opacity:1;transform:none}
+  @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}.btn{transition:none}}
+
+  /* ---------- Responsive ---------- */
+  @media(max-width:920px){
+    .hero .wrap{grid-template-columns:1fr}
+    .stack{height:auto;display:grid;gap:12px;max-width:430px}
+    .stackcard{position:static;transform:none;width:100%}
+    .stamp{display:none}
+    .lesson-b .grid{grid-template-columns:1fr}
+    .lab-grid{grid-template-columns:1fr}
+    .catbtns{grid-template-columns:repeat(2,1fr)}
+    .fb-duo{grid-template-columns:1fr}
+    .bignum-row{grid-template-columns:repeat(2,1fr)}
+    .catbar{grid-template-columns:130px 1fr 70px}
+    footer .wrap{grid-template-columns:1fr}
+    .strip{grid-template-columns:44px 1fr 56px}
+    .strip .ex{display:none}
+  }
+</style>
+</head>
+<body id="top">
+
+<!-- ═══════════ ÜST BAR ═══════════ -->
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="#top">
+      <svg viewBox="0 0 32 32" aria-hidden="true">
+        <rect x="1.5" y="1.5" width="29" height="29" fill="none" stroke="#211B12" stroke-width="3"/>
+        <text x="16" y="22.5" text-anchor="middle" font-family="Bricolage Grotesque,sans-serif" font-weight="800" font-size="17" fill="#C13F14">R</text>
+      </svg>
+      YDT READING LAB <span class="sub">opa fluent</span>
+    </a>
+    <nav class="topnav" id="topnav">
+      <a href="#dersler">Dersler</a>
+      <a href="#koklab">Kök Lab</a>
+      <a href="#deneme">Deneme</a>
+      <a href="#karne">Karne</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ═══════════ MASTHEAD ═══════════ -->
+<div class="mast">
+  <div class="wrap">
+    <span>OPA FLUENT YAYINLARI</span>
+    <span>YDT · YDS · YÖKDİL</span>
+    <span>READING BÜLTENİ · SAYI 01</span>
+  </div>
+</div>
+
+<!-- ═══════════ HERO ═══════════ -->
+<div class="hero">
+  <div class="wrap">
+    <div>
+      <p class="hero-kicker">Soru kökü anatomisi · Çeldirici dökümü · Anında geribildirim</p>
+      <h1 class="big">
+        Satır <span class="mark">aralarını</span> okumayı
+        <span class="serif">öğrenmenin en net yolu.</span>
+      </h1>
+      <p class="hero-lead">Kitapçıktaki <b>6 beceri kategorisi</b>, 6 derse dönüştü. Kaynak setin 100 soruluk cevap anahtarı dağılımına sadık, <b>5 özgün pasaj ve 15 soru</b> — her soruda beş şıkkın tek tek neden doğru ya da neden tuzak olduğu, <b>kanıt cümlesi pasajda işaretlenerek</b> gösterilir.</p>
+      <div class="cta-row">
+        <a class="btn" href="#dersler">Derse başla <svg class="ic" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+        <a class="btn ghost" href="#deneme">Denemeye geç</a>
+      </div>
+      <div class="hero-badges">
+        <div class="hb"><b>6</b><span>Becerİ dersİ</span></div>
+        <div class="hb"><b>15</b><span>Özgün soru</span></div>
+        <div class="hb"><b>5</b><span>Pasaj</span></div>
+        <div class="hb"><b>16</b><span>Soru kökü</span></div>
+      </div>
+    </div>
+    <div class="stack" aria-hidden="true">
+      <svg class="stamp" viewBox="0 0 128 128">
+        <circle cx="64" cy="64" r="60" fill="none" stroke="currentColor" stroke-width="3.5"/>
+        <circle cx="64" cy="64" r="46" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <text x="64" y="58" text-anchor="middle" font-family="Bricolage Grotesque" font-weight="800" font-size="13" fill="currentColor" letter-spacing="1.5">ÖSYM</text>
+        <text x="64" y="76" text-anchor="middle" font-family="Bricolage Grotesque" font-weight="800" font-size="13" fill="currentColor" letter-spacing="1.5">FORMAT</text>
+      </svg>
+      <div class="stackcard" style="--c:#C13F14">
+        <span class="tag">Doğrudan Bilgi</span>
+        <p>"According to the passage, the mechanism was first discovered ----."</p>
+        <small>Pasaja sadık kal · paraphrase'ı tanı</small>
+      </div>
+      <div class="stackcard" style="--c:#0E7568">
+        <span class="tag">Çıkarım</span>
+        <p>"It can be inferred from the passage that ----."</p>
+        <small>Bir adım öteye git · ama uçma</small>
+      </div>
+      <div class="stackcard" style="--c:#8F6400">
+        <span class="tag">Makro Analiz</span>
+        <p>"Which of the following would be the best title?"</p>
+        <small>Çatı testi · tüm paragrafları kapsa</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ BECERİ ŞERİTLERİ ═══════════ -->
+<div class="strips">
+  <div class="wrap">
+    <div id="strips"></div>
+  </div>
+</div>
+
+<!-- ═══════════ 01 DERSLER ═══════════ -->
+<section id="dersler">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="no">§01</span>
+      <h2>Konu Anlatımı</h2>
+      <p class="d">Soru kökü kategorilerinin anatomisi: yaygın kökler, Türkçe karşılıklar, çözüm yaklaşımı ve tuzak makineleri.</p>
+    </div>
+    <div id="lessons"></div>
+
+    <!-- Modal kesinlik ölçer -->
+    <div class="modalmod reveal">
+      <p class="h-mini" style="color:var(--ink)">Ek Modül · Kökün Kesinlik Ölçeri</p>
+      <h3 style="font-size:1.25rem;font-weight:800">Soru kökündeki modal, cevabın kesinliğini belirler</h3>
+      <p style="font-size:.92rem;color:var(--ink2);margin-top:8px">Soru kökleri standart kalıplar olsa da içerdiği modal ve çatı, aranan kanıtın niteliğini değiştirir. Kökü okurken fiili işaretleyin.</p>
+      <table>
+        <thead><tr><th>Modal</th><th>Soru kökündeki etkisi</th><th>Cevap beklentisi</th></tr></thead>
+        <tbody>
+          <tr><td>Must / Is</td><td>Kesinlik bildirir.</td><td>Metinde doğrudan, açık kanıt aranır.</td></tr>
+          <tr><td>Can / May</td><td>Olasılık veya çıkarım alanı açar.</td><td>Mantıksal bir boşluk doldurma beklenir.</td></tr>
+          <tr><td>Would</td><td>Varsayımsal bir durum sorgular.</td><td>Yazarın kuramsal yaklaşımları incelenir.</td></tr>
+        </tbody>
+      </table>
+      <div class="exbox">"It <b>is stated</b>" diyen bir kök metinde %100 bir karşılık ararken, "It <b>can be suggested</b>" diyen bir kök daha esnek bir çıkarım alanı bırakır. Bu denemede 1. soru ("first discovered") ve 9. soru ("clearly stated") birinci gruba; 13. soru ("may conclude ... partly") ikinci gruba örnektir.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 02 KÖK LAB ═══════════ -->
+<section id="koklab">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="no">§02</span>
+      <h2>Kök Lab — Tanıma Simülatörü</h2>
+      <p class="d">Soru kökünü gör, hangi beceri kategorisine ait olduğunu teşhis et. 16 gerçek kök üzerinde refleks kazanın.</p>
+    </div>
+    <div class="lab reveal">
+      <div class="lab-grid">
+        <div>
+          <div class="rootcard">
+            <p class="lbl" id="simCount">KÖK 1 / 16</p>
+            <p class="root" id="simRoot">Yükleniyor…</p>
+            <p class="tr" id="simTr"></p>
+          </div>
+          <div class="catbtns" id="simBtns"></div>
+          <div class="simfb" id="simFb">
+            <p class="verdict" id="simVerdict"></p>
+            <p id="simNote"></p>
+          </div>
+          <div style="margin-top:16px">
+            <button class="btn small" id="simNext">Sıradaki kök <svg class="ic" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
+          </div>
+        </div>
+        <div class="simside">
+          <div class="simstat"><b id="simScore">0</b><span>doğru teşhis</span></div>
+          <div class="simstat"><b id="simStreak">0</b><span>güncel seri</span></div>
+          <div class="simstat"><b id="simBest">0</b><span>en iyi seri</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 03 DENEME ═══════════ -->
+<section id="deneme">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="no">§03</span>
+      <h2>Özgün Deneme</h2>
+      <p class="d">5 pasaj · 15 soru · 5 şık. Şıkka tıklayın; geniş geribildirim anında açılır ve kanıt cümlesi pasajda sarıyla işaretlenir.</p>
+    </div>
+    <div class="legend reveal" id="legend"></div>
+    <div id="exam"></div>
+    <p class="footnote">Not: Sorular bu sayfa için yeniden yazılmıştır; doğru cevapların şık dağılımı (E, D, C, B, D, C, B, A, C, D, E, B, B, C, E), kaynağın 100 soruluk master seti anahtarının ilk 15 satırıyla uyumludur.</p>
+  </div>
+</section>
+
+<!-- ═══════════ 04 KARNE ═══════════ -->
+<section id="karne">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="no">§04</span>
+      <h2>Karne</h2>
+      <p class="d">İlerlemeniz bu tarayıcıda saklanır (localStorage) — sayfayı kapatıp geri dönseniz bile kaybolmaz.</p>
+    </div>
+    <div class="bignum-row reveal">
+      <div class="bignum"><b id="rDone">0</b><span>Çözülen / 15</span></div>
+      <div class="bignum"><b id="rRight" style="color:var(--ok)">0</b><span>Doğru</span></div>
+      <div class="bignum"><b id="rWrong" style="color:var(--bad)">0</b><span>Yanlış</span></div>
+      <div class="bignum"><b id="rPct">%0</b><span>Başarı</span></div>
+    </div>
+    <div id="reportBars" class="reveal"></div>
+    <div class="report-msg" id="reportMsg">Henüz veri yok — denemenin ilk sorusuyla başlayın.</div>
+    <div class="reset-row">
+      <button class="btn small ghost" id="resetBtn"><svg class="ic" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 2.8-6.5"/><polyline points="3 4 3 10 9 10"/></svg> Karnemi sıfırla</button>
+      <div class="confirmbox" id="confirmBox">
+        <span style="font-size:.85rem;font-weight:700">Tüm cevaplar silinecek. Emin misiniz?</span>
+        <button class="btn small" id="confirmYes">Evet, sıfırla</button>
+        <button class="btn small ghost" id="confirmNo">Vazgeç</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ FOOTER ═══════════ -->
+<footer id="iletisim">
+  <div class="wrap">
+    <div>
+      <h5>Kaynak & Künye</h5>
+      <p>Ders iskeleti: <span class="fl">Reading Soru Kökleri ve Soru Çözüm Yaklaşımları Kitaplığı</span> · Soru havuzu ilhamı: <span class="fl">Dr. Bünyamin Aksoy — Reading Comprehension Master Set (25 özgün metin, 100 özgün soru)</span>. Bu sayfadaki pasajlar ve sorular, Opa Fluent'in ÖSYM tarzına uygun üslubu referans alınarak site için yeniden kaleme alınmıştır.</p>
+      <p style="margin-top:12px">www.opafluent.com · @opafluent · @opafluentexams · +90 531 561 75 22</p>
+    </div>
+    <div>
+      <h5>GitHub → Netlify Dağıtımı</h5>
+      <div class="deploy">
+        <ol>
+          <li>Bu dosyayı <code>index.html</code> adıyla bir GitHub deposuna ekleyin.</li>
+          <li>Netlify'da <code>Add new site → Import an existing project</code> ile repo'yu bağlayın.</li>
+          <li>Build command: <b>yok</b> · Publish directory: <b>kök dizin</b>. Alternatif: <code>Deploy manually</code> ile dosyayı sürükleyip bırakın.</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+  <div class="wrap"><div class="footrow"><span>YDT READING LAB · OPA FLUENT</span><span>TEK DOSYA · DERLEME GEREKMEZ</span></div></div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ════════════════════════════════════════════════════════════
+   VERİ KATMANI
+   ════════════════════════════════════════════════════════════ */
+const CATS = {
+  lit:  {no:'01', name:'Doğrudan Bilgi',  en:'Literal Comprehension',      color:'#C13F14'},
+  inf:  {no:'02', name:'Çıkarım',         en:'Inferential Comprehension',  color:'#0E7568'},
+  glob: {no:'03', name:'Makro Analiz',    en:'Global Comprehension',       color:'#8F6400'},
+  lex:  {no:'04', name:'Kelime & Gönderim',en:'Lexical & Reference',       color:'#8E2D5A'},
+  neg:  {no:'05', name:'Negatif Sorgu',   en:'Except / NOT Questions',     color:'#221B14'},
+  tone: {no:'06', name:'Tutum & Ton',     en:'Evaluative Questions',       color:'#5B3E96'},
+};
+
+/* ---- Dersler (konu anlatımı kitapçığından sentezlendi) ---- */
+const LESSONS = [
+  { cat:'lit', title:'Doğrudan Bilgi ve Olgu Soruları', en:'Literal Comprehension',
+    roots:[
+      ['According to the passage…','Pasaja göre… (en temel ve en sık kullanılan kök)'],
+      ['It is stated in the passage that…','Pasajda belirtilmektedir ki…'],
+      ['The author points out that…','Yazar … noktasına dikkat çekmektedir.'],
+      ['It is clearly pointed out in the passage…','Pasajda açıkça vurgulanmaktadır ki…'],
+      ['The passage explains that…','Pasaj … durumunu açıklamaktadır.'],
+      ['As mentioned in the passage…','Pasajda değinildiği üzere…'],
+    ],
+    steps:[
+      'Soru kökündeki <b>anahtar kelimeyi</b> metinde bulun (keyword scan). Doğru şık neredeyse hiçbir zaman metnin aynı kelimeleriyle yazılmaz; <b>paraphrase</b> — aynı anlam, farklı kelimeler — tanınır.',
+      'Şıkları metinde süzün: fail değiştirilmiş mi, mutlaklık eklenmiş mi, uydurma ilişki var mı?',
+      'Kökteki fiilin kesinliğine bakın: "It is stated" = %100 açık kanıt (bkz. Modal Ölçer, altta).',
+    ],
+    trap:{t:'Penguen Tuzağı', d:'"According to the passage" = "sadece bu pasajın sınırlarına sadık kal". Pasaj, "penguenlerin yalnızca sıcak iklimlerde yaşadığı" gibi gerçek dışı bir iddia içeriyorsa, doğru cevap bilimsel gerçeği değil <b>pasajdaki iddiayı</b> onaylar. Sınav burada dil bilgisinin yanı sıra yönerge takibi disiplinini de ölçer. Genel kültürünüzü metne yansıtmayın.'}
+  },
+  { cat:'inf', title:'Çıkarım ve Akıl Yürütme Soruları', en:'Inferential Comprehension',
+    roots:[
+      ['It can be inferred from the passage that…','Pasajdan şu çıkarım yapılabilir…'],
+      ['One can understand from the passage that…','Pasajdan anlaşılmaktadır ki…'],
+      ['We can deduce from the passage that…','Pasajdan şu sonuca varabiliriz…'],
+      ['It is implied in the passage that…','Pasajda … ima edilmektedir.'],
+      ['One may conclude from the passage that…','Pasajdan şu yargıya varılabilir…'],
+    ],
+    steps:[
+      '<b>Satır aralarını okuyun:</b> veri + mantık = sonuç. Metni aşmayın ama metnin ima ettiği çerçeve içinde kalın.',
+      'Örnek: metin bir ilacın yan etkilerinin çok ağır olduğunu ve piyasadan toplatıldığını söylüyorsa, "ilacın halk sağlığı için bir tehdit oluşturduğu" <b>meşru bir çıkarımdır</b>.',
+      'Kökteki <b>infer / imply / conclude / deduce</b> fiilleri, bir sebep-sonuç köprüsü kurmanızı bekler.',
+    ],
+    trap:{t:'Yakın Görünümlü Çeldirici', d:'Bu kategorinin en yaygın tuzağı, metinde geçen bir kelimeyi kullanan ama anlamı tamamen saptıran "yakın görünümlü, yanlış içerikli" seçeneklerdir. 5. sorudaki "illuminating" şıkkı bu tuzağın canlı örneğidir: kelime teması doğru, anlam yanlış.'}
+  },
+  { cat:'glob', title:'Makro Analiz: Ana Fikir, Başlık, Yazarın Amacı', en:'Global Comprehension',
+    roots:[
+      ['What is the main idea of the passage?','Pasajın ana fikri nedir?'],
+      ['The passage mainly / largely deals with…','Pasaj esas olarak … konusunu ele almaktadır.'],
+      ['The primary purpose of the author is…','Yazarın temel amacı…'],
+      ['Which of the following is the best title?','Aşağıdakilerden hangisi en iyi başlıktır?'],
+      ['The main concern of the passage is…','Pasajın temel meselesi…'],
+    ],
+    steps:[
+      'Ana fikir, <b>topic sentence</b> (paragrafın ilk cümlesi) ve <b>concluding sentence</b> (son cümle) ile sıkı ilişki içindedir — ama metnin tamamına yayılan argümanı yakalayın.',
+      'Şıkka <b>çatı testi</b> uygulayın: pasajın tüm bölümlerini kapsıyor mu?',
+      'Bir seçeneğin ana fikir olması için metnin <b>bütün paragraflarını örtmeye</b> yetecek genellikte olması gerekir.',
+    ],
+    trap:{t:'Kapsam Darlığı Tuzağı', d:'Metin havacılığın tarihinden başlayıp İkinci Dünya Savaşı\u2019ndaki etkilerine ve günümüzdeki drone teknolojisine uzanıyorsa, "İkinci Dünya Savaşı\u2019nda havacılık" seçeneği <b>çok dar kapsamlı</b> olduğu için elenir. Adayların en büyük hatası, metnin yalnızca bir bölümündeki detayı tüm metnin ana fikri sanmasıdır.'}
+  },
+  { cat:'lex', title:'Kelime Bilgisi ve Gönderim Soruları', en:'Lexical & Reference Analysis',
+    roots:[
+      ['The word X in the passage is closest in meaning to…','Pasajdaki X kelimesine anlamca en yakın olan…'],
+      ['The word "it" in paragraph 2 refers to…','2. paragraftaki "it" kelimesi … ismine gönderme yapar.'],
+      ['The phrase "concomitant with" is closest in meaning to…','"… ile eş zamanlı/beraber" ifadesi şu anlama gelir…'],
+    ],
+    steps:[
+      'Kelime sorusu <b>sözlük değil bağlam (contextual) anlam</b> ister: seçeneklerin hepsi kelimenin gerçek anlamları olabilir; tek doğru, metindeki boşluğu anlamca doldurandır.',
+      'Gönderim sorularında önce <b>tekillik-çoğulluk (singular-plural)</b> ve cinsiyet uyumu kontrolü yapın: bu eleme sizi genelde birkaç kelime önceki isme götürür.',
+      'Örnek: "drones" (insansız hava araçları) kelimesinden sonra gelen "they" zamiri, bu <b>çoğul yapıya işaret eder</b>.',
+    ],
+    trap:{t:'Cinsel/Tematik Yakınlık Tuzağı', d:'Pasajın temasıyla ses uyumu taşıyan şıklar (okyanus pasajında "illuminating" gibi) kelime sorularının klasik tuzaklarıdır. Ses eşleşmesini değil, <b>anlam boşluğunun dolmasını</b> arayın.'}
+  },
+  { cat:'neg', title:'Negatif Sorgulama: "Except" ve "Not True" Yapıları', en:'Except / NOT Questions',
+    roots:[
+      ['Which of the following is NOT true according to the passage?','Pasaja göre aşağıdakilerden hangisi doğru değildir?'],
+      ['All of the following are mentioned EXCEPT…','Aşağıdakilerin tümü belirtilmiştir, … hariç.'],
+      ['It is NOT true that…','… olduğu doğru değildir.'],
+    ],
+    steps:[
+      '<b>Tara-ve-ele (scan and eliminate):</b> seçeneklerdeki anahtar kelimeleri metinde hızla bulun; yanına tik/çarpı işaretle. Dört doğruyu teyit edip elemek, yanlışı aramaktan hızlıdır.',
+      'Doğruyu işaretleme refleksine direnin: NOT / EXCEPT / FALSE büyük harfle yazılır ki gözden kaçmasın — kökü <b>iki kez okuyun</b>.',
+      'Bu tip, dört seçeneği teyit gerektirdiği için ciddi bir <b>zaman maliyeti</b> doğurur; denemede sona bırakmak akıllıca bir taktiktir.',
+    ],
+    trap:{t:'Stres Refleksi', d:'Sınav stresi altında adaylar bazen olumlu olanı işaretleme eğilimine girer. "NOT" gördüğünüz an kökün yanına kendiniz bir eksi işareti çizin — zihinsel iş yükünü kağıda aktarın.'}
+  },
+  { cat:'tone', title:'Yazarın Tutumu, Tonu ve Hedef Kitlesi', en:'Evaluative Questions',
+    roots:[
+      ['What is the author\u2019s attitude towards…?','Yazarın … konusundaki tutumu nedir?'],
+      ['The tone of the passage can be described as…','Pasajın tonu … olarak tanımlanabilir.'],
+      ['The author\u2019s style is primarily…','Yazarın üslubu öncelikle…'],
+    ],
+    steps:[
+      'Tutum, metindeki <b>sıfatlar (adjectives)</b> ve <b>zarflar (adverbs)</b> üzerinden okunur: yansız ve mümkünse işaretleyerek okuyun.',
+      'Ton sözlüğünüzü ezberleyin: <b>positive</b> (olumlu), <b>critical</b> (eleştirel), <b>neutral / objective</b> (tarafsız), <b>pessimistic</b> (kötümser), <b>impersonal</b> (nesnel).',
+      'Alan normunu bilin: tıbbi bir makalede yazar genellikle <b>nesnel</b> bir ton kullanırken, bir çevre kirliliği makalesinde <b>uyarıcı veya endişeli</b> bir ton takınabilir.',
+    ],
+    trap:{t:'Uç İfadeler', d:'"total rejection", "any real effect", "only", "never" gibi mutlak ifadeler taşıyan ton şıkları çoğunlukla çeldiricidir. Yazarın tonu, dilin nüanslarını (subtleties) yansıttığı ölçüde <b>dengeli</b> bir niteleme arayın.'}
+  },
+];
+
+/* ---- Kök Lab verisi ---- */
+const ROOTS = [
+  {en:'According to the passage, bees are able to communicate the direction of a food source ----.', tr:'Pasaja göre, arılar bir besin kaynağının yönünü iletebilir…', cat:'lit',  note:'"according to" = metne sadık, doğrudan bilgi. Cevap metinde açıkça yazar; paraphrase\u2019ı tanıyın.'},
+  {en:'It can be inferred from the passage that ----.', tr:'Pasajdan şu çıkarım yapılabilir…', cat:'inf', note:'"infer" fiili, yazılmayan ama ima edilen bir sonuç ister: bir adım öteye gidin, ama metnin mantıksal çerçevesini aşmayın.'},
+  {en:'Which of the following would be the most suitable title for this passage?', tr:'Aşağıdakilerden hangisi bu pasaj için en uygun başlıktır?', cat:'glob', note:'"best / suitable title" = makro kapsam: tüm paragrafları örten çatı. Çatı testi uygulayın.'},
+  {en:'The word "they" in paragraph 2 refers to ----.', tr:'2. paragraftaki "they" zamiri … ismine gönderme yapar.', cat:'lex', note:'"refers to" = gönderim sorusu. Önce çoğul-tekil uyuşumu (they → çoğul isim), sonra anlam uyumu kontrol edin.'},
+  {en:'All of the following are mentioned in the passage EXCEPT ----.', tr:'Aşağıdakilerin tümü pasajda belirtilmiştir, … hariç.', cat:'neg', note:'Büyük harfli EXCEPT = negatif sorgu. Doğru olanları teyit ederek (tik) yanlışı bulun; zamanı en çok yiyen köktür.'},
+  {en:'The author\u2019s attitude towards renewable energy can best be described as ----.', tr:'Yazarın yenilenebilir enerji konusundaki tutumu en iyi … olarak tanımlanabilir.', cat:'tone', note:'"attitude" = değerlendirici soru. Sıfat ve zarfları tarayın; uç nitelemelerden kaçının.'},
+  {en:'It is clearly pointed out in the passage that ----.', tr:'Pasajda açıkça vurgulanmaktadır ki…', cat:'lit', note:'"clearly pointed out" = %100 açık, doğrudan kanıt (Modal Ölçer: Must/Is grubu).'},
+  {en:'One may conclude from the passage that ----.', tr:'Pasajdan şu yargıya varılabilir…', cat:'inf', note:'"may conclude" = esnek çıkarım alanı (Can/May grubu). Mantıksal boşluk doldurma beklenir.'},
+  {en:'The primary purpose of the author is to ----.', tr:'Yazarın temel amacı…', cat:'glob', note:'"primary purpose" yazarın TÜM metin boyunca yaptığı işi sorar. Paragraflara görev etiketi verin; toplamı amaçtır.'},
+  {en:'The word "resilient" in the passage is closest in meaning to ----.', tr:'Pasajdaki "resilient" kelimesine anlamca en yakın olan…', cat:'lex', note:'"closest in meaning" = bağlamsal kelime anlamı. Sözlük değil, metnin boşluğunu dolduran anlamı seçin.'},
+  {en:'Which of the following is NOT true according to the passage?', tr:'Pasaja göre aşağıdakilerden hangisi doğru değildir?', cat:'neg', note:'NOT büyük harf = negatif sorgu. Üç şık metinden teyit edilir; metinle çelişen kalan şık cevaptır.'},
+  {en:'The tone of the passage can best be described as ----.', tr:'Pasajın tonu en iyi … olarak tanımlanabilir.', cat:'tone', note:'"tone" = genel duygusal renk. Metnin whole\u2019undaki sıfat-zarf iklimine bakın; tek cümleye değil tümüne.'},
+  {en:'As mentioned in the passage, early agricultural societies ----.', tr:'Pasajda değinildiği üzere, erken tarım toplulukları…', cat:'lit', note:'"as mentioned" = metinde geçen açık bilgi; anahtar kelimeyi tarayıp karşılığını bulun.'},
+  {en:'The phrase "concomitant with" is closest in meaning to ----.', tr:'"… ile eş zamanlı/beraber" ifadesi şu anlama gelir: en yakın anlam…', cat:'lex', note:'Kalıp ifade sorusu: parçayı tek kelime gibi düşünün ve cümle bağlamına oturtun.'},
+  {en:'The passage mainly deals with ----.', tr:'Pasaj esas olarak … konusunu ele almaktadır.', cat:'glob', note:'"mainly deals with" = konu kapsamı. Dar detay değil, metnin bütününü kapsayan özne arayın.'},
+  {en:'It is implied in the passage that ----.', tr:'Pasajda … ima edilmektedir.', cat:'inf', note:'"implied" = yazarın dolaylı mesajı. Metindeki sebep-sonuç zincirinden türeyen, yazılmayan sonuç.'},
+];
+
+/* ---- Pasajlar (her cümle ayrı kayıtlı; kanıt vurgulama için) ---- */
+const PASSAGES = [
+  { title:'The Antikythera Mechanism', meta:'Arkeoloji · Teknoloji Tarihi · ~290 kelime', paras:[
+    ['In 1901, sponge divers off the Greek island of Antikythera recovered a corroded lump of bronze from an ancient shipwreck.',
+     'Little did they know that this unremarkable object would overturn long-held assumptions about ancient technology.',
+     'Months later, archaeologist Valerios Stais noticed a gear embedded in the crust, and subsequent investigation revealed a device of astonishing complexity: at least thirty interlocking bronze gears, housed in a wooden case the size of a shoebox.'],
+    ['Now known as the Antikythera mechanism, the device is thought to have functioned as a mechanical calendar.',
+     'By turning a hand crank, the user could track the positions of the Sun and Moon through the zodiac, predict lunar and solar eclipses, and follow the four-year cycle of athletic games, including the ancient Olympics.',
+     'Inscriptions on the front and back plates served as an instruction manual of sorts, while rotating dials displayed dates in both the Egyptian and Greek calendars.'],
+    ['Nothing of comparable sophistication is known from the ancient world; geared mechanisms of this precision do not reappear in the historical record until the astronomical clocks of medieval Europe, more than a thousand years later.',
+     'Why such advanced craftsmanship seemingly vanished remains a mystery.',
+     'Some scholars suggest that the knowledge required to build such devices was restricted to a very small circle of craftsmen, and that this fragile tradition of expertise simply died out.',
+     'Whatever the explanation, the mechanism demonstrates that Hellenistic engineers possessed a level of theoretical and mechanical skill far beyond what historians had previously credited them with.'],
+  ]},
+  { title:'Light in the Dark: Deep-Sea Bioluminescence', meta:'Deniz Biyolojisi · ~270 kelime', paras:[
+    ['Sunlight penetrates only the uppermost layers of the ocean; below about 1,000 metres, the deep sea is a world of permanent darkness.',
+     'Yet this blackness is far from empty.',
+     'An estimated three quarters of the creatures living there can produce their own light, a phenomenon known as bioluminescence, generated by a chemical reaction between the molecule luciferin and the enzyme luciferase within specialized organs called photophores.'],
+    ['For deep-sea organisms, light is a language.',
+     'Some fish dangle luminous lures to attract prey in the dark, while others release glowing clouds of chemicals to confuse predators, a tactic rather like a burglar setting off a smoke alarm.',
+     'Certain squid and small crustaceans emit precisely timed flashes to signal to potential mates, and some species have evolved to use light as camouflage: by matching the faint blue glow of the surface water above them, they erase their own silhouettes, becoming invisible to predators hunting from below.'],
+    ['The practical difficulties of studying animals that cannot survive the pressures of the deep ocean in laboratory tanks have long slowed research.',
+     'In recent decades, however, submersibles equipped with sensitive cameras have allowed biologists to observe bioluminescent behaviour in its natural setting.',
+     'Their recordings suggest that signalling patterns are far more varied and information-rich than previously assumed, leading some researchers to describe the deep sea as the largest and most poorly charted communication network on Earth.'],
+  ]},
+  { title:'An Ancient Remedy in Modern Hospitals: Honey', meta:'Tıp Tarihi · Klinik Araştırma · ~280 kelime', paras:[
+    ['For thousands of years, long before the discovery of bacteria, healers applied honey to wounds.',
+     'Egyptian medical papyri from around 1550 BC prescribe it for injuries, and it appears in the pharmacopoeias of ancient Greece, India and China alike.',
+     'Remarkably, this ancient remedy is attracting renewed attention in modern hospitals, where antibiotic-resistant bacteria have become a serious clinical problem.'],
+    ['Laboratory studies have clarified why honey works.',
+     'Its high sugar concentration draws water out of bacterial cells through osmosis, effectively dehydrating them, while its natural acidity slows the growth of most species.',
+     'In addition, when bees add the enzyme glucose oxidase to nectar, hydrogen peroxide — a mild antiseptic — is slowly released as the honey ripens.',
+     'Some varieties, notably those made from the nectar of the tea tree of New Zealand, contain additional antibacterial compounds that are still being identified.'],
+    ['Clinical results have been encouraging.',
+     'Randomized trials comparing honey-impregnated dressings with conventional treatments for burns have found faster healing and reduced scarring in some patient groups.',
+     'Nevertheless, specialists caution that honey is not a substitute for antibiotics in every situation; the evidence is strongest for wounds and burns, and standard medical treatments must not be abandoned.',
+     'What the history of honey does demonstrate is that traditional remedies, once subjected to rigorous scientific testing, can occasionally yield surprisingly valuable medicines.'],
+  ]},
+  { title:'When a Language Falls Silent', meta:'Dilbilim · Kültür Tarihi · ~300 kelime', paras:[
+    ['Of the roughly 7,000 languages spoken today, linguists estimate that as many as half may disappear by the end of this century.',
+     'Languages do not simply fade away; they are usually abandoned, as younger generations shift to a dominant language in search of better education, employment and social mobility.',
+     'Once a community\u2019s children stop learning a language, its future is effectively sealed, because fluent adult speakers alone cannot pass it on.'],
+    ['The consequences extend far beyond words.',
+     'Each language encodes a distinctive way of classifying experience — kinship systems, medicinal plant knowledge, oral histories, songs and creation myths.',
+     'When a language falls silent, this accumulated knowledge, much of which has never been written down, disappears with it.',
+     'In this sense, linguists compare language loss to the burning of a library whose books exist in no other copies.'],
+    ['Revitalization efforts, however, show that decline is not always irreversible.',
+     'Hebrew, once confined to liturgy and scholarship, was revived as a daily language of an entire nation.',
+     'In New Zealand, Māori-language \u2018nests\u2019 — preschools run by elders — have raised a new generation of speakers.',
+     'Digital technology is now aiding the fight: researchers are building searchable archives of recorded speech, and smartphone apps are teaching endangered languages to scattered learners.',
+     'The obstacles remain formidable, but the record so far suggests that with community commitment and adequate support, even a language on the brink can be brought back from it.'],
+  ]},
+  { title:'The Placebo Effect', meta:'Psikoloji · Tıp Etiği · ~290 kelime', paras:[
+    ['When patients in a clinical trial improve after taking a pill that contains no active ingredient, they are said to have experienced the placebo effect.',
+     'For much of the twentieth century, doctors regarded this response as little more than a nuisance — a source of error that trials were designed to eliminate.',
+     'Patients who reported feeling better after sugar pills were assumed to be either imagining their recovery or attempting to please their physicians.'],
+    ['This dismissive view has not survived contact with modern brain imaging.',
+     'Studies have shown that placebo treatments can trigger measurable changes in brain chemistry: in trials of painkillers, for example, placebo injections have been found to release endogenous opioids, the body\u2019s own pain-relieving chemicals.',
+     'Expectation appears to be the driving force.',
+     'When patients sincerely believe they are receiving effective treatment, the belief itself sets physiological machinery in motion, and the effect is stronger when treatment is given with visible confidence by a doctor in a white coat than when a pill is handed over casually.'],
+    ['The implications for medical practice remain contentious.',
+     'Some researchers argue that harnessing the placebo response could reduce reliance on strong medications; others object that it involves deceiving patients, which would breach the trust on which the doctor-patient relationship depends.',
+     'Both camps agree on one point: the placebo effect is not an illusion to be filtered out of the data, but a genuine — and still poorly understood — expression of the mind\u2019s influence over the body.'],
+  ]},
+];
+
+/* ---- Sorular (şık dağılımı kaynak anahtarla uyumlu: E D C B D C B A C D E B B C E) ---- */
+const QUESTIONS = [
+  { id:1, p:0, cat:'lit',
+    stem:'According to the passage, the Antikythera mechanism was first discovered <em class="kw">----</em>.',
+    clue:'"According to the passage" cevabı metnin sınırlarına kilitler; "first discovered" nitelemesi ise sizi pasajın açılış cümlelerine yönlendirir.',
+    opts:[
+      ['by archaeologists who were excavating a temple on a Greek island','Doğru kelimeler, yanlış ilişki: "Greek island" ve "archaeologist" metinde geçiyor; ancak bulgu bir tapınak kazısında değil bir gemi batığında yapıldı ve bulanlar arkeologlar değil sünger dalgıçlarıydı.'],
+      ['during the restoration of a medieval European astronomical clock','Antika saatler metinde yalnızca bin yıl sonraki teknik benzerlik olarak anılır (paragraf 3); keşif bağlamıyla ilgisi yoktur.'],
+      ['together with a papyrus manual describing how it worked','Kullanım açıklaması papirüs değil, cihazın ön ve arka yüzündeki yazıtlardır (paragraf 2). "Instruction manual" ifadesi alınmış, taşıyıcı değiştirilmiştir.'],
+      ['by treasure hunters who were searching for bronze statues','Dalgıç temasına en yakın çeldirici; ancak metinde heykel arayan bir ekip yok — sünger dalgıçları işlerini yaparken buldular.'],
+      ['by sponge divers who were unaware of its importance','DOĞRU. "Sponge divers … recovered a corroded lump of bronze" + "Little did they know that this unremarkable object would overturn long-held assumptions" → öneminin farkında olmayan sünger dalgıçları.'],
+    ],
+    ans:4, ev:['p0-s0','p0-s1'],
+    why:'İlk iki cümle birlikte okunduğunda tablo nettir: bulanlar sünger dalgıçlarıydı ve buldukları şeyin ne olduğunu bilmiyorlardı. "Little did they know" ifadesinin "unaware of its importance" biçimindeki karşılığı, ders kitabındaki "eş anlamlılandırma" (paraphrasing) mekanizmasının ders kitabı örneğidir.',
+    strat:'Anahtar terimi tarayın ("discovered" → "recovered"). Doğru şık neredeyse her zaman aynı bilgiyi FARKLI kelimelerle söyler; metnin aynı kelimeleriyle kurulan şıklar genelde çeldiricidir. Genel kültürünüzü değil pasajı referans alın.'},
+  { id:2, p:0, cat:'lex',
+    stem:'In paragraph 3, the phrase <em class="kw">"this fragile tradition"</em> refers to <em class="kw">----</em>.',
+    clue:'"The phrase X refers to" kökü gönderim sorusudur: önce dil bilgisi uyumunu (this + tekil öbek), sonra anlam uyumunu kontrol edin.',
+    opts:[
+      ['the practice of carving inscriptions onto metal plates','"Inscriptions" paragraf 2\u2019den taşınmıştır; yazıt oymak, uzman bilgi aktarımıyla ("tradition of expertise") ilgisiz bir zanaattir.'],
+      ['the specialized knowledge shared by a very small circle of craftsmen','DOĞRU. Gönderim hemen önceki "the knowledge required to build such devices was restricted to a very small circle of craftsmen" öbeğine düşer.'],
+      ['the four-year cycle of the athletic games','Diyallerde izlenen bir detay (paragraf 2); "fragile tradition" ifadesiyle anlam bağı kurmaz.'],
+      ['the craft of building wooden cases for gears','Teknik bir ayrıntıdan üretilmiş dar yorum; ahşap kutu yapımı "kolay kaybolan bir bilgi aktarımı" değildir.'],
+      ['the profession of diving for sponges in the Aegean','Açılıştaki "sponge divers" kelimesinden türetilmiş görsel çeldirici; üçüncü paragrafta geçmez ve bir mesleği değil cihaz yapma bilgisini işaret eder.'],
+    ],
+    ans:1, ev:['p0-s8'],
+    why:'Gönderim zinciri: "this fragile tradition" → hemen öncesindeki "the knowledge required to build such devices was restricted to a very small circle of craftsmen". "Fragile" (kolay kırılan/kaybolan) sıfatı anlamlıdır: kaynağı az sayıda kişi olan bilgi, o dar çevre yok olduğunda kolayca kaybolur — nitekim metin "simply died out" diyor.',
+    strat:'Gönderim sorularında iki filtre çalıştırın: (1) UYUM — "this" + tekil isim arıyorsanız tekil bir isim öbeği arayın; (2) ANLAM — zamirin yanındaki sıfat ("fragile") gönderilen şeyin doğasına uymalı. Tanımlayıcı sıfat çoğu zaman doğru cevabın anahtarıdır.'},
+  { id:3, p:0, cat:'neg',
+    stem:'According to the passage, the user of the Antikythera mechanism could do all of the following <em class="kw">EXCEPT</em> <em class="kw">----</em>.',
+    clue:'Büyük harfli EXCEPT\u2019i ikinci kez okuyun: yanlış OLMAYANI değil, metinde bulunmayan ya da çelişen şıkkı arıyorsunuz. Stres altında "doğruyu işaretleme" bilinen bir reflekstir.',
+    opts:[
+      ['keep track of the schedule of athletic games','Metinde VAR: "follow the four-year cycle of athletic games, including the ancient Olympics" — bu şık teyit edildi, tik koyun.'],
+      ['predict the dates of lunar and solar eclipses','Metinde VAR: "predict lunar and solar eclipses" — teyit edildi.'],
+      ['repair the bronze gears by turning the hand crank','DOĞRU CEVAP (EXCEPT). "By turning a hand crank, the user could track …" — kol, cihazı ÇALIŞTIRMA aracıdır; onarım işlevi metinde yoktur.'],
+      ['monitor the positions of the Sun and the Moon','Metinde VAR: "track the positions of the Sun and Moon through the zodiac" — teyit edildi.'],
+      ['read the date in two different calendar systems','Metinde VAR: "dates in both the Egyptian and Greek calendars" — teyit edildi.'],
+    ],
+    ans:2, ev:['p0-s4','p0-s5'],
+    why:'Şık, metnin gerçek bir detayını ("hand crank") alıp ona var olmayan bir işlev (tamir) yükler: klasik "tahrif" tekniği. Kol, pasajda açıkça cihazı çalıştırmak ve diyalleri hareket ettirmek içindir.',
+    strat:'"Tara-ve-ele" (scan and eliminate): her şıkkın anahtar kelimesini metinde hızla bulun, buldukça yanına tik, çelişeni çarpı koyun. Dört şık kolayca teyit edilir; arta kalan şık cevaptır. Bu tip zamanı en çok yediği için şıkları kâğıtta işaretlemek zihinsel yükü azaltır.'},
+  { id:4, p:1, cat:'inf',
+    stem:'<em class="kw">One can understand</em> from the passage that a deep-sea animal that matches the faint light coming from above <em class="kw">----</em>.',
+    clue:'"One can understand" kökü, cevabın metne yazılmadığını ama metnin ima ettiği mantıksal çerçeve içinde kaldığını söyler.',
+    opts:[
+      ['must be hunting for prey near the ocean floor','Kamuflaj, avcıdan KORUNMA stratejisidir; "ocean floor" metinde geçmez. Taktiğin amacı ters çevrilmiştir.'],
+      ['is less likely to be detected by predators below','DOĞRU. "…they erase their own silhouettes, becoming invisible to predators hunting from below" → fark edilme olasılığı düşer.'],
+      ['belongs to the small minority that can produce light','Metnin sayısal verisi tersidir: canlıların ÜÇ ÇEYREĞİ ışık üretir; "small minority" sayısal tahriftir.'],
+      ['produces light by means other than luciferin','Işık üretimi luciferin + luciferase tepkimesiyle açıklanır; kamuflaj yapan türlerin farklı molekül kullandığı söylenmemiştir.'],
+      ['can be kept alive comfortably in laboratory tanks','Metnin tam aksi: "cannot survive the pressures of the deep ocean in laboratory tanks" (paragraf 3).'],
+    ],
+    ans:1, ev:['p1-s5'],
+    why:'Kanıt cümlesi: "…they erase their own silhouettes, becoming invisible to predators hunting from below". Görünmez olmak = fark edilme olasılığının azalması. Metin "detection" kelimesini kullanmaz; bu köprüyü siz kurarsınız — tam bir çıkarım örneği.',
+    strat:'Çıkarım sorularında doğru cevap metnin bilgisinden tam "bir adım" ötededir: sıfır adım (metinde yazan — çeldirici olur) ne on adım (spekülasyon). "Invisible to predators" ile "less likely to be detected" arasındaki mesafe tam bir adımdır.'},
+  { id:5, p:1, cat:'lex',
+    stem:'The word <em class="kw">"charting"</em> in the last paragraph is closest in meaning to <em class="kw">----</em>.',
+    clue:'"Closest in meaning" kökü, kelimenin SÖZLÜK değil BAĞLAMSAL anlamını sorar: önce cümleyi kendi içinde okuyun, sonra şıkları boşluğa yerleştirin.',
+    opts:[
+      ['ignoring','"Poorly charted" çevresindeki olumsuz hava "ignoring"i cazip kılar; ancak "ihmal" bir tavır, "charting" ise bir eylemdir — anlam kayması.'],
+      ['illuminating','En güçlü çeldirici: pasajın ışık temasına yaslanır. "Charting" ışıkla değil bilgi ve harita ile ilgilidir — "yakın görünümlü ama yanlış içerik" klasiği.'],
+      ['measuring','Ölçüm nicel bir işlemdir; derin deniz "iletişim ağının" ölçümünden değil kapsamının belgelenmesinden söz ediliyor.'],
+      ['mapping','DOĞRU. Bir ağı "chart" etmek, haritasını çıkarmak, bileşenlerini tanımlayıp belgelemektir.'],
+      ['protecting','Koruma anlamı bağlamda yok; araştırmacılar ağı korumuyor, keşfedip belgeliyor.'],
+    ],
+    ans:3, ev:['p1-s8'],
+    why:'"The largest and most poorly charted communication network on Earth" — bir ağı "chart" etmek, onun haritasını çıkarmak, bileşenlerini tanımlayıp belgelemektir. Kelime denizcilikten gelir (sea chart = deniz haritası) ve metnin okyanus temasıyla organik bağ kurar; araştırmacıların kayıtları (recordings) bu "haritalamanın" araçlarıdır.',
+    strat:'Kelime sorusunda şıkların HEPSİ kelimenin gerçek sözlük anlamları olabilir. Tek seçme kriteri: kelimeyi cümleden çıkarın, hangi anlam boşluğu anlamsal olarak dolduruyor? Ses ve tema yakınlığıyla (illuminating!) değil, anlamla gelin.'},
+  { id:6, p:1, cat:'glob',
+    stem:'What is the <em class="kw">main idea</em> of the passage?',
+    clue:'"Main idea" kökü metnin tamamını sorar: şıklarda kapsam karşılaştırması yapın — en dar değil, en kapsayıcı-DOĞRU şık kazanır.',
+    opts:[
+      ['The chemistry of light production in the deep sea has now been fully understood.','Hem "fully" (aşırı genelleme) hem kapsam darlığı: araştırmanın sürdüğü metnin sonunda açıkça yazılıdır.'],
+      ['Only fish are able to use bioluminescence for hunting in the dark.','"Only" mutlağı + kapsamı tek cümleye indirgeme; ayrıca kalamar ve krustasealar da ışık kullanır.'],
+      ['In the permanently dark deep sea, light works as a vital multipurpose tool, and much about it still awaits discovery.','DOĞRU. Üç paragrafı da kapsayan "çatı" cümlesi: karanlık + işlevler + bilinmeyenler.'],
+      ['Submersibles will soon replace laboratory tanks in deep-sea research.','Metin ikisini yarıştırmıyor; gelecek tahmini de eklenmiş bir tahrif.'],
+      ['Squid mainly use light signals to confuse their predators.','Tek cümlelik detay; ayrıca kalamarın sinyali eş bulmak içindir, düşmanı şaşırtmak değil.'],
+    ],
+    ans:2, ev:['p1-s3','p1-s8'],
+    why:'Çatı testi: bu şık üç paragrafı da örter — (1) karanlık derinlikler ve ışık üretimi, (2) "light is a language": avlanma, kaçış, eş bulma, kamuflaj, (3) araştırmanın henüz başlangıç aşamasında olması. Ana fikir şıkkı, metnin hiçbir bölümünü kapının dışında bırakmaz; ikinci yarısı kapanış cümlesinin ("most poorly charted") ta kendisidir.',
+    strat:'Her şıkka çatı testi uygulayın: pasajın TÜM paragraflarını kapsıyor mu? Tek paragraftan beslenen her şık kapsam darlığından elenir. Metnin ilk cümlesi (topic sentence) ve son cümlesi (concluding sentence) ana fikrin ağırlık merkezleridir.'},
+  { id:7, p:2, cat:'tone',
+    stem:'The author\u2019s <em class="kw">attitude</em> towards the use of honey in modern medicine can best be described as <em class="kw">----</em>.',
+    clue:'"Can best be described as" kalıbı tek doğru niteleme ister: yazarın hem olumlu hem temkinli sinyalleri varsa cevap ikisini birden taşıyan şıktır.',
+    opts:[
+      ['outright enthusiasm, with total rejection of conventional drugs','Uç ifrat: metin "standard medical treatments must not be abandoned" diyerek tam tersini emreder.'],
+      ['cautious approval, based on scientific evidence','DOĞRU. "Encouraging", "faster healing" (olumlu) + "nevertheless", "caution" (temkin) = ölçülü, kanıta dayalı onay.'],
+      ['deep nostalgia for the medicine of ancient Egypt','Yazar geçmişe övgü yapmıyor; balın yeniden gündeme gelmesi modern bir soruna (antibiyotik direnci) bağlanmıştır.'],
+      ['indifference to the value of traditional remedies','İlgisizlik değil — konu, metnin tam merkezinde.'],
+      ['doubt about whether honey has any real effect','Kuşku değil; etki mekanizması laboratuvarla açıklanmış (paragraf 2).'],
+    ],
+    ans:1, ev:['p2-s7','p2-s9'],
+    why:'Tutum, metnin duygusal kimyasında saklıdır: "encouraging", "faster healing" (olumlu sinyaller) + "Nevertheless", "specialists caution", "must not be abandoned" (temkin sinyalleri). Birlikte okunduğunda tablo net: yazar balın değerine inanıyor ama sınırları bilimsel bulgularla çiziyor — ölçülü onay (cautious approval).',
+    strat:'Ton sorularında sıfat ve zarfları tarayın; sonra uçları eleyin: "total rejection", "any real effect" gibi mutlak ifadeler çeldirici karakterlidir. Dengeli, kanıta atıf yapan şıklar ton sorularının güvenli limanıdır. Ton sözlüğünüz: positive / critical / neutral (objective) / pessimistic / impersonal.'},
+  { id:8, p:2, cat:'inf',
+    stem:'<em class="kw">One can understand</em> from the passage that, before the discovery of bacteria, <em class="kw">----</em>.',
+    clue:'Zaman zarflı çıkarımda iki ayrı bilgi zaman ekseninde birleştirilir; anakronizm (tarih dışı) iddialar otomatik elenir.',
+    opts:[
+      ['healers used honey on wounds without knowing how it worked','DOĞRU. "Long before the discovery of bacteria, healers applied honey" (kullanım) + "Laboratory studies have clarified why honey works" (neden sonradan açıklandı → önceden bilinmiyordu).'],
+      ['honey was avoided in the treatment of injuries','Metnin tam tersi: binlerce yıldır uygulanmış.'],
+      ['only Egyptian healers were aware of honey\u2019s antiseptic properties','"Only" mutlağı + Yunan, Hint ve Çin eczacılıklarında da geçer; ayrıca mekanizmayı bilmeden kullanıyorlardı.'],
+      ['physicians tested remedies in randomized clinical trials','Randomize denemeler modern bir yöntemdir (paragraf 3) — anakronizm tuzağı.'],
+      ['antibiotic-resistant bacteria were already a major concern','Bu GÜNÜN sorunudur (paragraf 1) — anakronizm tuzağı.'],
+    ],
+    ans:0, ev:['p2-s0','p2-s3'],
+    why:'İki metin verisini zaman ekseninde birleştirin: "long before the discovery of bacteria, healers applied honey to wounds" (kullanım var, tarih eski) + "Laboratory studies have clarified why honey works" (neden "şimdi" aydınlatıldı → önceden bilinmiyordu). Mantıksal köprü: sebep bilinmeden kullanılıyordu.',
+    strat:'Çıkarım sorularının en sevdiği yapı, metnin iki ayrı noktasını birleştiren tek iddiadır. Tarih (bakterilerin keşfi) ve epistemoloji (clarified = sonradan aydınlatıldı) kesişince cevap kendiliğinden belirir. Zaman uyumsuzluğu taşıyan D ve E gibi şıklar "anakronizm" filtresinden anında elenir.'},
+  { id:9, p:2, cat:'lit',
+    stem:'It is <em class="kw">clearly stated</em> in the passage that <em class="kw">----</em>.',
+    clue:'Kökteki "clearly" bir uyarı bandıdır: tam ve eksiksiz kanıt istenir; "muhtemelen" gibi yorum katılamaz (Modal Ölçer: Must/Is grubu).',
+    opts:[
+      ['glucose oxidase is added to honey by pharmaceutical companies','Fail değiştirilmiş: enzimi ŞİRKETLER değil ARILAR ekler ("when bees add the enzyme glucose oxidase…").'],
+      ['all varieties of honey contain the same antibacterial compounds','Mutlaklık tahrifi: "Some varieties … contain additional antibacterial compounds" — hepsi aynı değil.'],
+      ['the sugar in honey dehydrates bacteria by drawing water out of their cells','DOĞRU. "Its high sugar concentration draws water out of bacterial cells … effectively dehydrating them" cümlesinin hafif yeniden yazılmış hâli.'],
+      ['honey dressings have now replaced antibiotics in most hospitals','Metnin tersi: "honey is not a substitute for antibiotics in every situation".'],
+      ['the Egyptians borrowed the medicinal use of honey from Indian healers','Metinde dört uygarlık PARALEL olarak sayılıyor; ödünç alma ilişkisi belirtilmemiş — uydurulmuş bir bağ.'],
+    ],
+    ans:2, ev:['p2-s4'],
+    why:'"Its high sugar concentration draws water out of bacterial cells through osmosis, effectively dehydrating them" cümlesi bu şıkta neredeyse birebir, yalnızca hafifçe yeniden yazılmıştır: "draws water out" → "drawing water out", "dehydrating them" → "dehydrates bacteria". "It is clearly stated" kökü %100 açık kanıt ister ve bu şık tam olarak onu verir.',
+    strat:'"It is stated / clearly pointed out" kökünde modallık yok — kesinlik (%)100 kanıt aranır. Her şıkkı üç süzgeçten geçirin: (1) faili değiştirilmiş mi? (2) mutlaklık eklenmiş mi ("all", "only")? (3) ilişki uydurulmuş mu? Bu üç süzgeçten geçemeyen her şık elenir.'},
+  { id:10, p:3, cat:'glob',
+    stem:'The <em class="kw">primary purpose</em> of the author is to <em class="kw">----</em>.',
+    clue:'"Primary purpose" yazarın TÜM metin boyunca yaptığı işi sorar. Paragraflara görev etiketi verin; etiketlerin toplamı amaçtır.',
+    opts:[
+      ['explain why Hebrew\u2019s revival was more successful than other efforts','Hebrew tek örnek olarak verilir; hiçbir karşılaştırma yapılmaz.'],
+      ['prove that linguists\u2019 estimates of language loss are exaggerated','Yazar tahminleri sorgulamıyor; olduğu gibi aktarıyor ("linguists estimate that as many as half…").'],
+      ['blame younger generations for abandoning their mother tongues','Yazar suçlamıyor, NEDEN anlatıyor: eğitim, iş, sosyal hareketlilik arayışı. "Blame" tonu metinde yok.'],
+      ['present the scale and consequences of language loss, and highlight efforts that can reverse it','DOĞRU. Metnin mimarisinin bileşimi: problem (ölçek + neden) → kayıp (kütüphane metaforu) → umut (canlandırma çabaları).'],
+      ['argue that only digital tools can save endangered languages','"Only" uçlu; İbranice ve Māori örnekleri dijital araçlar olmadan başarılmıştır.'],
+    ],
+    ans:3, ev:['p3-s0','p3-s3','p3-s7'],
+    why:'Metnin mimarisini okuyun: Paragraf 1 = ölçek ve neden (7.000 dilin yarısı, kuşak değişimi); Paragraf 2 = kaybın niteliği (kütüphane metaforu); Paragraf 3 = tersine çevrilebilirlik kanıtları (İbranice, Māori, dijital araçlar). Bu şık üç katmanın bileşimidir: "scale and consequences" + "efforts that can reverse it". Amaç sorusu, aynı zamanda mimari sorusudur.',
+    strat:'Her paragrafa tek kelimelik görev etiketi verin: "tanımlıyor", "korkutuyor", "umut veriyor"… Etiketlerin toplamı yazarın amacıdır. Tek paragraftan ya da tek örnekten (Hebrew, Māori, dijital araçlar) beslenen her şık kapsam darlığından elenir.'},
+  { id:11, p:3, cat:'neg',
+    stem:'All of the following are stated in the passage <em class="kw">EXCEPT</em> <em class="kw">----</em>.',
+    clue:'"All of the following … EXCEPT" kökü üç aşama ister: oku, tara, ele. Harflerin büyük yazılması, stres altında gözden kaçmasın diye tasarlanmıştır.',
+    opts:[
+      ['that unwritten knowledge, such as songs and oral histories, can be lost when a language disappears','Metinde VAR: "oral histories, songs and creation myths" + "much of which has never been written down, disappears with it" — teyit edildi.'],
+      ['that a language\u2019s survival depends essentially on children learning it','Metinde VAR: "Once a community\u2019s children stop learning a language, its future is effectively sealed" — teyit edildi.'],
+      ['that preschools run by elders have created new Māori speakers','Metinde VAR: "Māori-language \u2018nests\u2019 — preschools run by elders — have raised a new generation of speakers" — teyit edildi.'],
+      ['that Hebrew was long restricted to religious and scholarly use','Metinde VAR: "Hebrew, once confined to liturgy and scholarship" — teyit edildi.'],
+      ['that languages usually die out because their speakers physically die out','DOĞRU CEVAP (EXCEPT). Metnin tam tersi: diller konuşurları ölerek değil, yeni kuşaklar dili BIRAKTIĞI için terk edilir.'],
+    ],
+    ans:4, ev:['p3-s1'],
+    why:'Metnin 2. cümlesi kontrastı açıkça kurar: "Languages do not simply fade away; they are usually abandoned" — diller, konuşurlarının fiziksel yok oluşundan değil, kuşakların baskın dile GEÇİŞİNDEN ölüyor. Son şık bu toplumsal gerçeği biyolojik bir iddiaya dönüştürür: metinde olmayan, hatta çelişen bir bilgi.',
+    strat:'EXCEPT sorularında çoğu şık metinden tek cümlelik alıntılarla kolayca doğrulanır — bunlar "tik" şıklardır. Asıl risk, metnin karşı çıktığı iddiayı yumuşatılmış dille sunan son şıkka düşmektir. Eleme sırası: en kolay doğrulananlardan başlayın; en sona kalan şıkta çelişki saklıdır.'},
+  { id:12, p:3, cat:'lex',
+    stem:'In paragraph 2, the comparison to <em class="kw">"a library whose books exist in no other copies"</em> implies that the knowledge carried by a language <em class="kw">----</em>.',
+    clue:'Metafor gönderiminde imgeyi düz dile ÇEVİRİN: "library", "burning", "no copies" üçlüsünün somut karşılıklarını şıklarda arayın.',
+    opts:[
+      ['is safely stored in national library archives','Ters okuma: metnin kütüphanesi YANIYOR — güvenli arşiv iması çelişir.'],
+      ['exists in no other form and cannot be recovered once the language is lost','DOĞRU. Tek nüsha = başka biçimde kopyası olmayan bilgi; önceki cümle anahtarı verir: "much of which has never been written down".'],
+      ['can easily be translated into dominant languages','Metaforun tersi: kopyası olmayan bilgi çeviriyle de kurtarılamaz.'],
+      ['is gradually being published by linguists','Arşivlenen şey kayıtlı KONUŞMADIR; "yayınlama" iddiası metinde yok.'],
+      ['consists only of songs and creation myths','"Only" mutlağı; liste daha geniştir: akrabalık sistemleri, bitki bilgisi, sözlü tarihler…'],
+    ],
+    ans:1, ev:['p3-s5','p3-s6'],
+    why:'Metaforı parçalara ayırın: "yanan kütüphane" = kalıcı, geri dönüşsüz kayıp; "tek nüsha kitaplar" = başka hiçbir yerde kopyası bulunmayan bilgi. Bir önceki cümle anahtarı verir: "much of which has never been written down" — yani bu bilgi yazılı bir yedek taşımıyor. Dil susunca bilgi de onunla gidiyor.',
+    strat:'Metafor ve gönderim sorularında tekniğiniz "çeviri" olsun: imgeyi düz dille yeniden yazın, şıklarda bu düz çeviriyi arayın. "No other copies" ifadesinin yankısı doğru şıkta ("no other form … cannot be recovered") birebir vardır.'},
+  { id:13, p:4, cat:'inf',
+    stem:'<em class="kw">One may conclude</em> from the passage that the strength of the placebo effect partly depends on <em class="kw">----</em>.',
+    clue:'"May conclude" ve "partly" ölçülülük işaretidir (Modal Ölçer: Can/May grubu): kesin kanıt değil, mantıksal boşluk doldurma beklenir.',
+    opts:[
+      ['the number of pills the patient is given','Metinde hap sayısından hiç söz edilmez.'],
+      ['the manner in which the treatment is administered','DOĞRU. "…stronger when treatment is given with visible confidence by a doctor in a white coat than when a pill is handed over casually" — değişken, sunum biçimidir.'],
+      ['the chemical content of the placebo pill','Tanım gereçi tersi: plasebo "no active ingredient" içerir; etkinin kaynağı içerik değil beklentidir.'],
+      ['whether the patient has previously used painkillers','Geçmiş kullanım metinde yok; ağrı kesici örneği yalnızca mekanizmayı (endorfin salınımı) göstermek içindir.'],
+      ['the patient\u2019s desire to please family members','Metnin İLK paragrafındaki eski (çürütülmüş) varsayımdan ("please their physicians") dönüştürülmüş kelime-tuzağı; ayrıca hekimleri memnun etme iddiası artık geçersiz sayılıyor.'],
+    ],
+    ans:1, ev:['p4-s6'],
+    why:'Kanıt, karşılaştırma yapısındadır: "the effect is stronger when treatment is given with visible confidence … than when a pill is handed over casually". İki durum, tek değişken: tedavinin SUNULUŞ biçimi. Sunum farkı etki farkına denk çıkıyor; kökteki "partly" ve "may conclude" ölçülülüğü de doğru şıkkın dengeli tonuyla uyumludur.',
+    strat:'Karşılaştırma yapıları (stronger … than) çıkarım sorularının altın madenidir: değişkenleri ayırın, hangi faktör farkı yaratıyor? Ayrıca kök niteleyicilerine kulak verin: "partly", "to some extent" ölçülü doğru cevaba işaret eder; "only", "entirely" taşıyan şıklara şüpheyle yaklaşın.'},
+  { id:14, p:4, cat:'lex',
+    stem:'The word <em class="kw">"contentious"</em> in the final paragraph is closest in meaning to <em class="kw">----</em>.',
+    clue:'Bilinmeyen kelimenin cümlesinden ÖNCEKİ ve SONRAKİ cümleleri okuyun: "some … others" kalıbı tartışmayı, yani doğru cevabı müjdeler.',
+    opts:[
+      ['settled','Antonym (ters anlam) tuzağı: "remain contentious" = hâlâ ÇÖZÜLMEMİŞ. "Settled" tam zıttıdır.'],
+      ['superficial','"Görünüşte kalan" değil; konu, etik açıdan derin bir tartışmadır.'],
+      ['controversial','DOĞRU. Hemen ardından iki karşıt kamp sıralanır: "Some researchers argue … others object".'],
+      ['temporary','Süreklilik yanlış: "remain" süregiden bir tartışmayı anlatır; "geçici" anlamı bağlamda yok.'],
+      ['medical','Alan adı — kelime teması tuzağı; "contentious" bir tıp terimi değildir.'],
+    ],
+    ans:2, ev:['p4-s7','p4-s8'],
+    why:'Bağlamın mimarisini okuyun: "Some researchers argue that … others object that …" — hemen ardından iki karşıt kamp sıralanıyor. Bir konu üzerinde taraflı tartışmanın sürmesi = "controversial". Kelimenin kökü "contend" (mücadele etmek / tartışmak) da bunu teyit eder.',
+    strat:'Kelime sorusunda tanımı, kelimenin cümlesinin ÇEVRESİNDE arayın: "some … others", "however", "in contrast" yapıları bilinmeyen kelimenin anlam ipucunu ücretsiz dağıtır. Ayrıca ters-anlam tuzaklarına dikkat: "remain contentious" ile "settled" birbirinin zıttıdır — ilk şık bu zıttı kullanarak yaklaştırır.'},
+  { id:15, p:4, cat:'glob',
+    stem:'Which of the following would be the <em class="kw">best title</em> for this passage?',
+    clue:'"Best title" = ana fikir + üslup. İki filtre: KAPSAM (tüm paragraflar) ve TON (pasajın dengesi).',
+    opts:[
+      ['"Deceiving Patients: The Case Against Modern Medicine"','Tek tarafın görüşünü başlığa dönüştürür ve tonu ifratlaştırır; yazar iki tarafı da dengeli sunar.'],
+      ['"A History of Clinical Trials in the Twentieth Century"','Yanlış konu: klinik deneylerin tarihini anlatan bir metin değil; ilk paragraf yalnızca giriş işlevi görür.'],
+      ['"Endogenous Opioids: Nature\u2019s Strongest Painkillers"','Tek paragraflık detay + "strongest" aşırılığı; metnin bütünü opioidler değildir.'],
+      ['"Why Patients Should Stop Trusting Their Doctors"','Güven teması ters çevrilmiş: yazar, güveni doktor-hasta ilişkisinin temeli olarak görüyor.'],
+      ['"The Placebo Effect: How Belief Reshapes Healing"','DOĞRU. Üç paragrafı da kapsar: eski kuşku, beklentinin beyinde yarattığı gerçek değişim ve bu gücü kullanmanın etik tartışması.'],
+    ],
+    ans:4, ev:['p4-s5','p4-s9'],
+    why:'Başlık, ana fikrin en kısa özüdür — çatı testi: bu başlık altında üç paragraf da yerli yerinde: (1) eski kuşkucu bakış, (2) beklentinin beyni ve iyileşmeyi yeniden şekillendirmesi, (3) bu gücü kullanmanın etik tartışması. Kapanış cümlesindeki "the mind\u2019s influence over the body" ifadesi başlığın ta kendisidir.',
+    strat:'Başlık sorusunda iki filtre çalıştırın: KAPSAM (tüm paragrafları kapsıyor mu?) ve ÜSLUP (pasajın tonunu yansıtıyor mu?). İlk ve dördüncü şıklar ton olarak ifratlı; ikinci şık yanlış konu; üçüncü şık tek paragraflık detay. Kapsam darlığı, başlık sorularının bir numaralı çeldirici motorudur.'},
+];
+
+/* ════════════════════════════════════════════════════════════
+   DURUM + YARDIMCILAR
+   ════════════════════════════════════════════════════════════ */
+const KEY='ydt-reading-lab-v1';
+let state={ans:{},sim:{score:0,streak:0,best:0,idx:0}};
+try{const raw=localStorage.getItem(KEY); if(raw){const s=JSON.parse(raw); state.ans=s.ans||{}; state.sim=Object.assign(state.sim,s.sim||{});}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+
+function el(tag,cls,html){const n=document.createElement(tag); if(cls)n.className=cls; if(html!==undefined)n.innerHTML=html; return n;}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+function catQ(c){return QUESTIONS.filter(q=>q.cat===c).length;}
+function toast(msg){const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),2200);}
+
+/* Cümle kayıt defteri: "p0-s4" → {text, node} */
+const SENT={};
+PASSAGES.forEach((p,pi)=>{let k=0; p.paras.forEach(par=>par.forEach(s=>{SENT[`p${pi}-s${k++}`]={text:s,node:null};}));});
+
+/* ════════════════════════════════════════════════════════════
+   HERO ŞERİTLERİ
+   ════════════════════════════════════════════════════════════ */
+(function(){
+  const box=document.getElementById('strips');
+  Object.entries(CATS).forEach(([k,c])=>{
+    const row=el('div','strip'); row.style.setProperty('--c',c.color);
+    row.innerHTML=`<div class="num">${c.no}</div>
+      <div class="nm"><b>${c.name}</b><span>${c.en}</span></div>
+      <div class="ex">${esc(LESSONS.find(l=>l.cat===k).roots[0][0])}</div>
+      <div class="cnt">${catQ(k)} soru</div>`;
+    row.addEventListener('click',()=>{openLesson(k); document.getElementById('dersler').scrollIntoView({behavior:'smooth'});});
+    box.appendChild(row);
+  });
+})();
+
+/* ════════════════════════════════════════════════════════════
+   DERSLER
+   ════════════════════════════════════════════════════════════ */
+const LESSON_EL={};
+(function(){
+  const box=document.getElementById('lessons');
+  LESSONS.forEach(L=>{
+    const c=CATS[L.cat];
+    const wrap=el('div','lesson reveal'); wrap.style.setProperty('--c',c.color);
+    const head=el('button','lesson-h');
+    head.innerHTML=`<span class="cbar">${c.no}</span>
+      <span class="tts"><b>${L.title}</b><span>${c.en} · ${L.roots.length} yaygın kök</span></span>
+      <span class="chev"><svg class="ic" viewBox="0 0 24 24" width="20" height="20"><polyline points="6 9 12 15 18 9"/></svg></span>`;
+    const body=el('div','lesson-b');
+    const grid=el('div','grid');
+    const left=el('div');
+    left.innerHTML=`<p class="h-mini">Yaygın Soru Kökleri</p>
+      <table class="roots-t">${L.roots.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td></tr>`).join('')}</table>`;
+    const right=el('div');
+    right.innerHTML=`<p class="h-mini">Çözüm Yaklaşımı</p>
+      <ul class="steps">${L.steps.map(s=>`<li>${s}</li>`).join('')}</ul>
+      <div class="trapbox"><b>Tuzak Alanı · ${L.trap.t}</b>${L.trap.d}</div>`;
+    grid.append(left,right); body.append(grid); wrap.append(head,body); box.append(wrap);
+    head.addEventListener('click',()=>wrap.classList.toggle('open'));
+    LESSON_EL[L.cat]=wrap;
+  });
+})();
+function openLesson(cat){for(const k in LESSON_EL){LESSON_EL[k].classList.toggle('open',k===cat);}}
+
+/* ════════════════════════════════════════════════════════════
+   KÖK LAB
+   ════════════════════════════════════════════════════════════ */
+let simOrder=[];
+(function(){
+  const b=document.getElementById('simBtns');
+  Object.entries(CATS).forEach(([k,c])=>{
+    const btn=el('button','catb',c.name); btn.style.setProperty('--c',c.color); btn.dataset.cat=k;
+    btn.addEventListener('click',()=>simAnswer(k,btn));
+    b.append(btn);
+  });
+  document.getElementById('simNext').addEventListener('click',simNext);
+  simOrder=shuffle([...ROOTS.keys()]);
+  state.sim.idx=Math.min(state.sim.idx,simOrder.length);
+  renderSimStats(); renderRoot();
+})();
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function renderRoot(){
+  const i=state.sim.idx%simOrder.length;
+  const r=ROOTS[simOrder[i]];
+  document.getElementById('simCount').textContent=`KÖK ${i+1} / ${simOrder.length}`;
+  document.getElementById('simRoot').textContent=r.en;
+  document.getElementById('simTr').textContent='TR: '+r.tr;
+  document.querySelectorAll('.catb').forEach(b=>{b.classList.remove('wasright','waswrong'); b.disabled=false;});
+  document.getElementById('simFb').classList.remove('show');
+}
+function simAnswer(k,btn){
+  if(document.getElementById('simFb').classList.contains('show'))return;
+  const r=ROOTS[simOrder[state.sim.idx%simOrder.length]];
+  const ok=k===r.cat;
+  document.querySelectorAll('.catb').forEach(b=>{
+    b.disabled=true;
+    if(b.dataset.cat===r.cat)b.classList.add('wasright');
+  });
+  if(!ok)btn.classList.add('waswrong');
+  if(ok){state.sim.score++; state.sim.streak++; state.sim.best=Math.max(state.sim.best,state.sim.streak);}
+  else state.sim.streak=0;
+  save(); renderSimStats();
+  const fb=document.getElementById('simFb');
+  const v=document.getElementById('simVerdict');
+  v.textContent=ok?'Doğru teşhis — '+CATS[r.cat].name:'Yanlış — bu kök '+CATS[r.cat].name+' kategorisindendi';
+  v.className='verdict '+(ok?'ok':'no');
+  document.getElementById('simNote').innerHTML=r.note;
+  fb.classList.add('show');
+}
+function simNext(){
+  state.sim.idx++;
+  if(state.sim.idx%simOrder.length===0){simOrder=shuffle(simOrder); toast('Kök destesi yeniden karıştırıldı');}
+  save(); renderRoot();
+}
+function renderSimStats(){
+  document.getElementById('simScore').textContent=state.sim.score;
+  document.getElementById('simStreak').textContent=state.sim.streak;
+  document.getElementById('simBest').textContent=state.sim.best;
+}
+
+/* ════════════════════════════════════════════════════════════
+   DENEME — PASAJLAR + SORULAR
+   ════════════════════════════════════════════════════════════ */
+(function(){
+  const legend=document.getElementById('legend');
+  Object.values(CATS).forEach(c=>{const ch=el('span','chip',c.name); ch.style.setProperty('--c',c.color); legend.append(ch);});
+  const exam=document.getElementById('exam');
+  PASSAGES.forEach((P,pi)=>{
+    const card=el('div','pcard reveal');
+    const h=el('div','pcard-h');
+    h.innerHTML=`<span class="pno">PASAJ ${pi+1} / ${PASSAGES.length}</span><h3>${esc(P.title)}</h3><span class="pmeta">${esc(P.meta)}</span>`;
+    const tx=el('div','ptext');
+    P.paras.forEach(par=>{
+      const p=el('p');
+      par.forEach(s=>{
+        const key=`p${pi}-s${Object.keys(SENT).filter(k=>k.startsWith(`p${pi}-`)).length}`; // altta gerçek id ile span kurulacak
+        const span=el('span','sent',esc(s)+' ');
+        p.append(span);
+      });
+      tx.append(p);
+    });
+    card.append(h,tx);
+    /* cümle kimliklerini ata */
+    let k=0; tx.querySelectorAll('.sent').forEach(s=>{const id=`p${pi}-s${k++}`; s.id=id; SENT[id].node=s;});
+    QUESTIONS.filter(q=>q.p===pi).forEach(q=>card.append(buildQ(q)));
+    exam.append(card);
+  });
+})();
+
+function buildQ(q){
+  const c=CATS[q.cat];
+  const card=el('div','qcard reveal'); card.style.setProperty('--c',c.color); card.id='q'+q.id;
+  const top=el('div','qtop');
+  top.innerHTML=`<span class="chip">${c.name}</span><span class="qn">SORU ${String(q.id).padStart(2,'0')} / 15</span><span class="pts">${q.opts.length} şık · tek deneme</span>`;
+  const stem=el('p','stem',q.stem);
+  const opts=el('div','opts');
+  q.opts.forEach((o,i)=>{
+    const b=el('button','opt');
+    b.innerHTML=`<span class="key">${'ABCDE'[i]}</span><span>${esc(o[0])}</span><span class="mk"><svg class="ic" viewBox="0 0 24 24" width="18" height="18"><polyline points="20 6 9 17 4 12"/></svg></span>`;
+    b.addEventListener('click',()=>pick(q,i));
+    b.dataset.i=i; opts.append(b);
+  });
+  card.append(top,stem,opts);
+  const fb=el('div','fb'); card.append(fb);
+  return card;
+}
+
+function pick(q,i){
+  if(state.ans[q.id]!==undefined)return;
+  state.ans[q.id]=i; save();
+  paintQ(q); updateReport();
+}
+
+function paintQ(q){
+  const card=document.getElementById('q'+q.id);
+  const c=CATS[q.cat];
+  card.classList.add('answered');
+  const chosen=state.ans[q.id]; const ok=chosen===q.ans;
+  card.querySelectorAll('.opt').forEach((b,i)=>{
+    b.classList.toggle('correct',i===q.ans);
+    b.classList.toggle('wrongpick',i===chosen&&!ok);
+    b.querySelector('.mk').innerHTML=i===q.ans
+      ?'<svg class="ic" viewBox="0 0 24 24" width="18" height="18"><polyline points="20 6 9 17 4 12"/></svg>'
+      :(i===chosen?'<svg class="ic" viewBox="0 0 24 24" width="18" height="18"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>':'');
+  });
+  const fb=card.querySelector('.fb'); fb.classList.add('show');
+  const evq=q.ev.map(id=>`“${esc(SENT[id].text)}”`).join(' ');
+  fb.innerHTML=`
+    <div class="fb-h ${ok?'ok':'no'}">
+      <svg class="ic" viewBox="0 0 24 24" width="18" height="18">${ok?'<polyline points="20 6 9 17 4 12"/>':'<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>'}</svg>
+      ${ok?'Doğru — '+c.name+' becerisi yerinde':'Yanlış — doğru cevap: '+'ABCDE'[q.ans]}
+    </div>
+    <div class="fb-b">
+      ${ok?'':`<h4>Seçimin analizi · <b>${'ABCDE'[chosen]}</b></h4><p class="fb-p">${esc(q.opts[chosen][1])}</p>`}
+      <h4>Neden <b>${'ABCDE'[q.ans]}</b> doğru?</h4>
+      <p class="fb-p">${esc(q.opts[q.ans][1]).replace(/^DOĞRU\.\s*/,'')}</p>
+      <p class="fb-p" style="margin-top:6px">${esc(q.why)}</p>
+      <h4>Pasajdaki kanıt</h4>
+      <div class="evq">${evq}</div>
+      <h4>Şık şık geribildirim — çeldirici dökümü</h4>
+      <ul class="dump">
+        ${q.opts.map((o,i)=>`<li class="${i===q.ans?'okr':''} ${i===chosen&&i!==q.ans?'mine':''}"><span class="k">${'ABCDE'[i]}${i===q.ans?' ✓':(i===chosen?' ✗':'')}</span><span>${esc(o[1])}</span></li>`).join('')}
+      </ul>
+      <h4>Saha notları</h4>
+      <div class="fb-duo">
+        <div class="fb-box tint"><b>Kökteki ipucu</b>${esc(q.clue)}</div>
+        <div class="fb-box"><b>Stratejik not</b>${esc(q.strat)}</div>
+      </div>
+      <div class="fb-act">
+        <button class="btn small evbtn">Kanıtı pasajda işaretle</button>
+      </div>
+    </div>`;
+  fb.querySelector('.evbtn').addEventListener('click',evToggle(q,card));
+}
+function evToggle(q,card){
+  return function(){
+    const btn=card.querySelector('.evbtn');
+    const marked=card.closest('.pcard').querySelectorAll('.sent.evid').length>0;
+    card.closest('.pcargd');
+    document.querySelectorAll('.sent.evid').forEach(s=>s.classList.remove('evid'));
+    document.querySelectorAll('.evbtn').forEach(b=>{b.textContent='Kanıtı pasajda işaretle';});
+    if(marked){return;}
+    let first=null;
+    q.ev.forEach(id=>{const s=SENT[id].node; if(s){s.classList.add('evid'); if(!first)first=s;}});
+    if(first)first.scrollIntoView({behavior:'smooth',block:'center'});
+    btn.textContent='Vurguyu kaldır';
+  };
+}
+
+/* Sayfa açılışında daha önce cevaplanmış soruları geri boya */
+QUESTIONS.forEach(q=>{if(state.ans[q.id]!==undefined)paintQ(q);});
+
+/* ════════════════════════════════════════════════════════════
+   KARNE
+   ════════════════════════════════════════════════════════════ */
+function updateReport(){
+  const done=Object.keys(state.ans).length;
+  let right=0;
+  QUESTIONS.forEach(q=>{if(state.ans[q.id]===q.ans)right++;});
+  const wrong=done-right;
+  document.getElementById('rDone').textContent=done;
+  document.getElementById('rRight').textContent=right;
+  document.getElementById('rWrong').textContent=wrong;
+  document.getElementById('rPct').textContent='%'+(done?Math.round(right/done*100):0);
+  const bars=document.getElementById('reportBars'); bars.innerHTML='';
+  let bestC=null,worstC=null;
+  Object.entries(CATS).forEach(([k,c])=>{
+    const qs=QUESTIONS.filter(q=>q.cat===k);
+    const d=qs.filter(q=>state.ans[q.id]!==undefined).length;
+    const r=qs.filter(q=>state.ans[q.id]===q.ans).length;
+    const pct=d?Math.round(r/d*100):0;
+    if(d>0){ if(bestC===null||pct>bestC.p)bestC={p:pct,n:c.name,d:d,r:r}; if(worstC===null||pct<worstC.p)worstC={p:pct,n:c.name,d:d,r:r}; }
+    const row=el('div','catbar'); row.style.setProperty('--c',c.color);
+    row.innerHTML=`<div class="nm">${c.name}<span>${c.en}</span></div>
+      <div class="track"><div class="fill" style="width:${pct}%"></div></div>
+      <div class="sc">${d?r+' / '+d:'— / '+qs.length}</div>`;
+    bars.append(row);
+  });
+  const msg=document.getElementById('reportMsg');
+  if(!done){msg.textContent='Henüz veri yok — denemenin ilk sorusuyla başlayın.';}
+  else if(done<QUESTIONS.length){msg.innerHTML=`<b>${done}/15</b> soru çözüldü. Kalan ${QUESTIONS.length-done} soru tamamlanınca karnen kesinleşecek — şimdilik en güçlü alanın: <b>${bestC.n}</b> (%${bestC.p}).`;}
+  else{msg.innerHTML=`Deneme tamam! Doğru: <b>${right}/15</b> · Başarı: <b>%${Math.round(right/15*100)}</b>. En güçlü alanın <b>${bestC.n}</b> (%${bestC.p}), çalışman gereken alan <b>${worstC.n}</b> (%${worstC.p}). Ders bölümünde o kategorinin "Tuzak Alanı" kutusunu yeniden oku, sonra denemeyi sıfırlayıp tekrar dene.`;}
+}
+updateReport();
+
+/* Sıfırlama akışı (alert yerine satır içi onay) */
+document.getElementById('resetBtn').addEventListener('click',()=>{
+  document.getElementById('confirmBox').classList.add('show');
+});
+document.getElementById('confirmNo').addEventListener('click',()=>{
+  document.getElementById('confirmBox').classList.remove('show');
+});
+document.getElementById('confirmYes').addEventListener('click',()=>{
+  state.ans={}; save();
+  QUESTIONS.forEach(q=>{
+    const card=document.getElementById('q'+q.id);
+    card.classList.remove('answered');
+    card.querySelectorAll('.opt').forEach(b=>{b.classList.remove('correct','wrongpick'); b.querySelector('.mk').innerHTML='';});
+    card.querySelector('.fb').classList.remove('show'); card.querySelector('.fb').innerHTML='';
+  });
+  document.querySelectorAll('.sent.evid').forEach(s=>s.classList.remove('evid'));
+  document.getElementById('confirmBox').classList.remove('show');
+  updateReport(); toast('Karne sıfırlandı — taze başlangıçlar');
+  document.getElementById('deneme').scrollIntoView({behavior:'smooth'});
+});
+
+/* ════════════════════════════════════════════════════════════
+   GÖRSEL CANLILIK: reveal + scroll spy
+   ════════════════════════════════════════════════════════════ */
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:.08});
+document.querySelectorAll('.reveal').forEach(n=>io.observe(n));
+
+const secIo=new IntersectionObserver(es=>{
+  es.forEach(e=>{
+    if(e.isIntersecting){
+      document.querySelectorAll('#topnav a').forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+e.target.id));
+    }
+  });
+},{rootMargin:'-40% 0px -55% 0px'});
+['dersler','koklab','deneme','karne'].forEach(id=>secIo.observe(document.getElementById(id)));
+</script>
+</body>
+</html>
