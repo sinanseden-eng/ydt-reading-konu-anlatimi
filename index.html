@@ -2,6 +2,9 @@
 <!--
   ═══════════════════════════════════════════════════════════════════
   YDT READING LAB — tek dosyalık statik site (harici bağımlılık yok)
+  v2: Özgün Deneme artık yan yana iki panelli (metin ⇄ soru),
+      her iki tarafta tıkla-vurgula (kalıcı mavi işaret) özelliğiyle.
+
   GITHUB + NETLIFY DAĞITIMI:
     1) Bu dosyayı bir GitHub deposuna "index.html" adıyla yükleyin.
     2) Netlify → "Add new site" → "Import an existing project" ile
@@ -18,7 +21,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>YDT Reading Lab — Soru Kökleri, Stratejiler ve Özgün Deneme</title>
-<meta name="description" content="YDT/YDS/YÖKDİL Reading için soru kökü anatomisi, 6 beceri dersi, soru kökü simülatörü ve her soruda geniş çeldirici dökümü sunan interaktif çalışma atölyesi.">
+<meta name="description" content="YDT/YDS/YÖKDİL Reading için soru kökü anatomisi, 6 beceri dersi, yan yana metin-soru paneli ve her soruda geniş çeldirici dökümü sunan interaktif çalışma atölyesi.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..800&family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..700&display=swap" rel="stylesheet">
@@ -27,7 +30,8 @@
     --paper:#F7F2E5; --card:#FCFAF2; --paper2:#EFE8D5;
     --ink:#211B12; --ink2:#6A5F4C; --line:#D9CFB8;
     --ok:#1E7A3E; --okbg:#E4F1E4; --bad:#C22B1E; --badbg:#F7E4E0;
-    --hl:#F6DA49;
+    --hl:#F6DA49;           /* sistem vurgusu (kanıt) */
+    --umark:#B7D5F2;        /* kullanıcının kendi mavi vurgusu */
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
@@ -157,34 +161,61 @@
   .simstat b{font-size:1.7rem;font-weight:800;display:block;line-height:1.1}
   .simstat span{font-size:.66rem;text-transform:uppercase;letter-spacing:.12em;color:var(--ink2)}
 
-  /* ---------- Deneme ---------- */
+  /* ═══════════════════════════════════════════════════════════
+     DENEME: yan yana iki panel (metin ⇄ sorular)
+     ═══════════════════════════════════════════════════════════ */
   .legend{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:26px}
   .chip{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--card);background:var(--c);padding:4px 10px}
   .footnote{font-size:.78rem;color:var(--ink2);font-style:italic;font-family:'Newsreader',serif;margin-top:10px}
-  .pcard{background:var(--card);border:2px solid var(--ink);box-shadow:8px 8px 0 rgba(33,27,18,.2);margin-bottom:36px}
-  .pcard-h{border-bottom:2px solid var(--ink);padding:16px 22px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
-  .pcard-h .pno{font-size:.62rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--paper);background:var(--ink);padding:3px 9px}
-  .pcard-h h3{font-family:'Newsreader',serif;font-weight:600;font-size:1.35rem}
-  .pcard-h .pmeta{margin-left:auto;font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink2)}
-  .ptext{padding:24px 26px;font-family:'Newsreader',serif;font-size:1.05rem;line-height:1.75;color:#2c241a}
-  @media(min-width:900px){.ptext{columns:2;column-gap:2.4rem;column-rule:1px solid var(--line)}}
-  .ptext p{margin-bottom:1em;break-inside:avoid-column}
-  .ptext p:last-child{margin-bottom:0}
-  .sent{box-decoration-break:clone;-webkit-box-decoration-break:clone;padding:1px 0;transition:background .3s}
-  .sent.evid{background:var(--hl);box-shadow:.28em 0 0 var(--hl),-.28em 0 0 var(--hl);border-radius:1px}
 
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;margin-bottom:42px}
+  .split-h{grid-column:1/-1;display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:var(--ink);color:var(--paper);border:2px solid var(--ink);padding:12px 18px;box-shadow:6px 6px 0 rgba(33,27,18,.2)}
+  .split-h .pno{font-size:.6rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;background:var(--paper);color:var(--ink);padding:3px 9px;flex:none}
+  .split-h h3{font-family:'Newsreader',serif;font-weight:600;font-size:1.25rem;color:#FCFAF2;line-height:1.2}
+  .split-h .pmeta{font-size:.64rem;text-transform:uppercase;letter-spacing:.1em;color:#B7AD97}
+  .split-h .hint{margin-left:auto;font-size:.68rem;color:#DDD4C0;display:flex;align-items:center;gap:6px}
+  .split-h .clr{font-family:inherit;font-weight:700;font-size:.64rem;letter-spacing:.08em;text-transform:uppercase;background:transparent;color:var(--paper);border:1.5px solid #6A5F4C;padding:6px 11px;cursor:pointer;transition:background .12s,border-color .12s}
+  .split-h .clr:hover{background:#3A3223;border-color:#8A7F66}
+
+  .pane{border:2px solid var(--ink);background:var(--card);box-shadow:6px 6px 0 rgba(33,27,18,.2);display:flex;flex-direction:column;min-height:0;height:clamp(460px,calc(100vh - 220px),760px)}
+  .pane-tab{flex:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 14px;border-bottom:2px solid var(--line);font-size:.6rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--ink2);background:var(--paper2)}
+  .pane-tab b{color:var(--ink);display:flex;align-items:center;gap:7px}
+  .pane-tab span{font-weight:700;letter-spacing:.06em}
+  .pane-body{flex:1;min-height:0;overflow-y:auto;padding:18px 22px}
+  .pane-body .qcard:first-child{margin-top:0}
+
+  /* Metin paneli tipografisi (tek kolon — yan yana düzen için) */
+  .ptext{font-family:'Newsreader',serif;font-size:1.03rem;line-height:1.8;color:#2c241a}
+  .ptext p{margin-bottom:1.05em}
+  .ptext p:last-child{margin-bottom:0}
+
+  /* ---- Vurgu sistemi ---- */
+  .ptext .sent{cursor:pointer;transition:background .15s;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+  .ptext .sent:hover{background:color-mix(in srgb,var(--umark) 45%,transparent)}
+  .sent.evid{background:var(--hl);box-shadow:.28em 0 0 var(--hl),-.28em 0 0 var(--hl);border-radius:1px}
+  .sent.umark{background:var(--umark);box-shadow:.28em 0 0 var(--umark),-.28em 0 0 var(--umark)}
+  .sent.evid.umark{background:linear-gradient(110deg,var(--hl) 0 47%,var(--umark) 47% 100%);box-shadow:.28em 0 0 var(--umark),-.28em 0 0 var(--hl)}
+
+  /* Soru kartları */
   .qcard{border:2px solid var(--ink);background:var(--card);box-shadow:5px 5px 0 rgba(33,27,18,.15);padding:20px 22px;margin:18px 0}
   .qtop{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
   .qtop .chip{background:var(--c)}
   .qtop .qn{font-size:.7rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink2)}
   .qtop .pts{margin-left:auto;font-size:.66rem;color:var(--ink2);font-style:italic;font-family:'Newsreader',serif}
-  .stem{font-family:'Newsreader',serif;font-size:1.18rem;line-height:1.45;margin-bottom:16px}
+  .stem{font-family:'Newsreader',serif;font-size:1.14rem;line-height:1.45;margin-bottom:16px;cursor:pointer;transition:background .15s}
+  .stem:hover{background:color-mix(in srgb,var(--umark) 30%,transparent)}
+  .stem.umark{background:var(--umark);box-shadow:.28em 0 0 var(--umark),-.28em 0 0 var(--umark)}
   .stem .kw{font-style:normal;font-family:'Bricolage Grotesque',sans-serif;font-weight:700;text-decoration:underline;text-decoration-color:var(--c);text-decoration-thickness:2.5px;text-underline-offset:4px}
+
   .opts{display:flex;flex-direction:column;gap:8px}
-  .opt{display:grid;grid-template-columns:34px 1fr 26px;align-items:start;gap:12px;padding:10px 12px;border:1.5px solid var(--line);background:var(--paper);cursor:pointer;font-family:inherit;font-size:.95rem;text-align:left;transition:border-color .12s,background .12s;width:100%;color:var(--ink)}
+  .opt{display:grid;grid-template-columns:34px 1fr 26px 30px;align-items:start;gap:12px;padding:10px 12px;border:1.5px solid var(--line);background:var(--paper);cursor:pointer;font-family:inherit;font-size:.95rem;text-align:left;width:100%;color:var(--ink);transition:border-color .12s,background .12s}
   .qcard:not(.answered) .opt:hover{border-color:var(--ink);background:var(--paper2)}
   .opt .key{font-weight:800;border:1.5px solid var(--ink);width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:.8rem;background:var(--card);flex:none}
   .opt .mk{display:flex;justify-content:center;align-items:center;color:transparent}
+  .pen{width:26px;height:26px;flex:none;border:1.5px solid var(--line);background:var(--card);color:var(--ink2);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;transition:background .12s,border-color .12s,color .12s}
+  .pen:hover{border-color:var(--ink);color:var(--ink);background:color-mix(in srgb,var(--umark) 60%,var(--card))}
+  .pen.on{background:var(--umark);border-color:var(--ink);color:var(--ink)}
+  .opt.umark{border:2px solid var(--ink);background:color-mix(in srgb,var(--umark) 40%,var(--paper))}
   .answered .opt{cursor:default}
   .answered .opt.correct{border:2px solid var(--ok);background:var(--okbg)}
   .answered .opt.correct .key{background:var(--ok);color:#fff;border-color:var(--ok)}
@@ -267,6 +298,12 @@
     footer .wrap{grid-template-columns:1fr}
     .strip{grid-template-columns:44px 1fr 56px}
     .strip .ex{display:none}
+    /* Deneme: paneller alt alta, metin kendi içinde kayar */
+    .split{grid-template-columns:1fr;gap:14px}
+    .split-h .hint{margin-left:0;width:100%}
+    .pane{height:auto;box-shadow:5px 5px 0 rgba(33,27,18,.15)}
+    .pane-body{padding:16px 16px}
+    .pane-body.ptext{max-height:52vh}
   }
 </style>
 </head>
@@ -309,7 +346,7 @@
         Satır <span class="mark">aralarını</span> okumayı
         <span class="serif">öğrenmenin en net yolu.</span>
       </h1>
-      <p class="hero-lead">Kitapçıktaki <b>6 beceri kategorisi</b>, 6 derse dönüştü. Kaynak setin 100 soruluk cevap anahtarı dağılımına sadık, <b>5 özgün pasaj ve 15 soru</b> — her soruda beş şıkkın tek tek neden doğru ya da neden tuzak olduğu, <b>kanıt cümlesi pasajda işaretlenerek</b> gösterilir.</p>
+      <p class="hero-lead">Kitapçıktaki <b>6 beceri kategorisi</b>, 6 derse dönüştü. Kaynak setin 100 soruluk cevap anahtarı dağılımına sadık, <b>5 özgün pasaj ve 15 soru</b> — her soruda beş şıkkın tek tek neden doğru ya da neden tuzak olduğu, <b>kanıt cümlesi metinde işaretlenerek</b> gösterilir.</p>
       <div class="cta-row">
         <a class="btn" href="#dersler">Derse başla <svg class="ic" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
         <a class="btn ghost" href="#deneme">Denemeye geç</a>
@@ -417,13 +454,13 @@
   </div>
 </section>
 
-<!-- ═══════════ 03 DENEME ═══════════ -->
+<!-- ═══════════ 03 DENEME (yan yana: metin ⇄ sorular) ═══════════ -->
 <section id="deneme">
   <div class="wrap">
     <div class="sec-head reveal">
       <span class="no">§03</span>
       <h2>Özgün Deneme</h2>
-      <p class="d">5 pasaj · 15 soru · 5 şık. Şıkka tıklayın; geniş geribildirim anında açılır ve kanıt cümlesi pasajda sarıyla işaretlenir.</p>
+      <p class="d">Metin solda, sorular sağda — paneller bağımsız kayar. Cümleye veya şıkktaki kaleme tıklayarak mavi vurgu ekleyin; işaretleriniz kaydedilir.</p>
     </div>
     <div class="legend reveal" id="legend"></div>
     <div id="exam"></div>
@@ -550,7 +587,7 @@ const LESSONS = [
       ['The phrase "concomitant with" is closest in meaning to…','"… ile eş zamanlı/beraber" ifadesi şu anlama gelir…'],
     ],
     steps:[
-      'Kelime sorusu <b>sözlük değil bağlam (contextual) anlam</b> ister: seçeneklerin hepsi kelimenin gerçek anlamları olabilir; tek doğru, metindeki boşluğu anlamca doldurandır.',
+      'Kelime sorusu <b>sözlük değil bağlam (contextual) anlam</b> ister: seçeneklerin hepsi kelimenin gerçek anlamları olabilir; tek doğru, metindeki boşluğu anlamca dolduranandır.',
       'Gönderim sorularında önce <b>tekillik-çoğulluk (singular-plural)</b> ve cinsiyet uyumu kontrolü yapın: bu eleme sizi genelde birkaç kelime önceki isme götürür.',
       'Örnek: "drones" (insansız hava araçları) kelimesinden sonra gelen "they" zamiri, bu <b>çoğul yapıya işaret eder</b>.',
     ],
@@ -604,7 +641,7 @@ const ROOTS = [
   {en:'It is implied in the passage that ----.', tr:'Pasajda … ima edilmektedir.', cat:'inf', note:'"implied" = yazarın dolaylı mesajı. Metindeki sebep-sonuç zincirinden türeyen, yazılmayan sonuç.'},
 ];
 
-/* ---- Pasajlar (her cümle ayrı kayıtlı; kanıt vurgulama için) ---- */
+/* ---- Pasajlar (her cümle ayrı kayıtlı; vurgulama için) ---- */
 const PASSAGES = [
   { title:'The Antikythera Mechanism', meta:'Arkeoloji · Teknoloji Tarihi · ~290 kelime', paras:[
     ['In 1901, sponge divers off the Greek island of Antikythera recovered a corroded lump of bronze from an ancient shipwreck.',
@@ -684,7 +721,7 @@ const QUESTIONS = [
     ],
     ans:4, ev:['p0-s0','p0-s1'],
     why:'İlk iki cümle birlikte okunduğunda tablo nettir: bulanlar sünger dalgıçlarıydı ve buldukları şeyin ne olduğunu bilmiyorlardı. "Little did they know" ifadesinin "unaware of its importance" biçimindeki karşılığı, ders kitabındaki "eş anlamlılandırma" (paraphrasing) mekanizmasının ders kitabı örneğidir.',
-    strat:'Anahtar terimi tarayın ("discovered" → "recovered"). Doğru şık neredeyse her zaman aynı bilgiyi FARKLI kelimelerle söyler; metnin aynı kelimeleriyle kurulan şıklar genelde çeldiricidir. Genel kültürünüzü değil pasajı referans alın.'},
+    strat:'Anahtar terimi tarayın ("discovered" → "recovered"). Doğru şık neredeyse her zaman aynı bilgiyi FARKLI kelimelerle söyler; metnin aynı kelimeleriyle kurulan şıklar genelde çeldiricidir. Genel kültürünüzü değil pasajı referans alın. Metindeki ipucu cümleyi maviyle işaretleyip soruyla yan yana karşılaştırın.'},
   { id:2, p:0, cat:'lex',
     stem:'In paragraph 3, the phrase <em class="kw">"this fragile tradition"</em> refers to <em class="kw">----</em>.',
     clue:'"The phrase X refers to" kökü gönderim sorusudur: önce dil bilgisi uyumunu (this + tekil öbek), sonra anlam uyumunu kontrol edin.',
@@ -710,7 +747,7 @@ const QUESTIONS = [
     ],
     ans:2, ev:['p0-s4','p0-s5'],
     why:'Şık, metnin gerçek bir detayını ("hand crank") alıp ona var olmayan bir işlev (tamir) yükler: klasik "tahrif" tekniği. Kol, pasajda açıkça cihazı çalıştırmak ve diyalleri hareket ettirmek içindir.',
-    strat:'"Tara-ve-ele" (scan and eliminate): her şıkkın anahtar kelimesini metinde hızla bulun, buldukça yanına tik, çelişeni çarpı koyun. Dört şık kolayca teyit edilir; arta kalan şık cevaptır. Bu tip zamanı en çok yediği için şıkları kâğıtta işaretlemek zihinsel yükü azaltır.'},
+    strat:'"Tara-ve-ele" (scan and eliminate): her şıkkın anahtar kelimesini metinde hızla bulun, buldukça yanına tik, çelişeni çarpı koyun. Dört şık kolayca teyit edilir; arta kalan şık cevaptır. Teyit ettiğiniz cümleleri metin panelinde maviyle işaretlemek, EXCEPT sorularında kaybolmanızı önler.'},
   { id:4, p:1, cat:'inf',
     stem:'<em class="kw">One can understand</em> from the passage that a deep-sea animal that matches the faint light coming from above <em class="kw">----</em>.',
     clue:'"One can understand" kökü, cevabın metne yazılmadığını ama metnin ima ettiği mantıksal çerçeve içinde kaldığını söyler.',
@@ -873,8 +910,15 @@ const QUESTIONS = [
    DURUM + YARDIMCILAR
    ════════════════════════════════════════════════════════════ */
 const KEY='ydt-reading-lab-v1';
-let state={ans:{},sim:{score:0,streak:0,best:0,idx:0}};
-try{const raw=localStorage.getItem(KEY); if(raw){const s=JSON.parse(raw); state.ans=s.ans||{}; state.sim=Object.assign(state.sim,s.sim||{});}}catch(e){}
+let state={ans:{},marks:{},sim:{score:0,streak:0,best:0,idx:0}};
+try{
+  const raw=localStorage.getItem(KEY);
+  if(raw){
+    const s=JSON.parse(raw);
+    state.ans=s.ans||{}; state.marks=s.marks||{};
+    state.sim=Object.assign(state.sim,s.sim||{});
+  }
+}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
 
 function el(tag,cls,html){const n=document.createElement(tag); if(cls)n.className=cls; if(html!==undefined)n.innerHTML=html; return n;}
@@ -988,46 +1032,117 @@ function renderSimStats(){
 }
 
 /* ════════════════════════════════════════════════════════════
-   DENEME — PASAJLAR + SORULAR
+   KULLANICI VURGULARI (mavi işaretler — kalıcı)
+   ════════════════════════════════════════════════════════════ */
+function markNode(key){
+  return document.getElementById(key)||document.querySelector('[data-mk="'+key+'"]');
+}
+function applyMarkNode(key){
+  const n=markNode(key);
+  if(n){n.classList.add('umark'); const pen=n.querySelector('.pen'); if(pen)pen.classList.add('on');}
+}
+function toggleMark(key,node,pi){
+  if(state.marks[key])delete state.marks[key]; else state.marks[key]=1;
+  node.classList.toggle('umark',!!state.marks[key]);
+  const pen=node.querySelector('.pen'); if(pen)pen.classList.toggle('on',!!state.marks[key]);
+  save(); updateTabs(pi);
+}
+function clearMarks(pi){
+  const prefs=[`p${pi}-s`].concat(QUESTIONS.filter(q=>q.p===pi).map(q=>q.id+'#'));
+  let n=0;
+  Object.keys(state.marks).forEach(k=>{
+    if(prefs.some(pre=>k.startsWith(pre))){
+      delete state.marks[k]; n++;
+      const node=markNode(k);
+      if(node){node.classList.remove('umark'); const pen=node.querySelector('.pen'); if(pen)pen.classList.remove('on');}
+    }
+  });
+  save(); updateTabs(pi);
+  toast(n?n+' işaret temizlendi':'Zaten işaret yoktu');
+}
+function updateTabs(pi){
+  const cnt=Object.keys(state.marks).filter(k=>k.startsWith(`p${pi}-s`)).length;
+  const m=document.getElementById('mkcnt-'+pi);
+  if(m)m.textContent=cnt?cnt+' işaretli cümle':'işaret yok';
+  const qs=QUESTIONS.filter(q=>q.p===pi);
+  const done=qs.filter(q=>state.ans[q.id]!==undefined).length;
+  const t=document.getElementById('qcnt-'+pi);
+  if(t)t.textContent=qs.length+' soru'+(done?' · '+done+' çözüldü':'');
+}
+
+/* ════════════════════════════════════════════════════════════
+   DENEME — yan yana paneller: METİN ⇄ SORULAR
    ════════════════════════════════════════════════════════════ */
 (function(){
   const legend=document.getElementById('legend');
   Object.values(CATS).forEach(c=>{const ch=el('span','chip',c.name); ch.style.setProperty('--c',c.color); legend.append(ch);});
   const exam=document.getElementById('exam');
+
   PASSAGES.forEach((P,pi)=>{
-    const card=el('div','pcard reveal');
-    const h=el('div','pcard-h');
-    h.innerHTML=`<span class="pno">PASAJ ${pi+1} / ${PASSAGES.length}</span><h3>${esc(P.title)}</h3><span class="pmeta">${esc(P.meta)}</span>`;
-    const tx=el('div','ptext');
+    const split=el('div','split reveal');
+    const h=el('div','split-h');
+    h.innerHTML=`<span class="pno">PASAJ ${pi+1} / ${PASSAGES.length}</span>
+      <h3>${esc(P.title)}</h3>
+      <span class="pmeta">${esc(P.meta)}</span>
+      <span class="hint"><svg class="ic" viewBox="0 0 24 24" width="13" height="13"><path d="M17 3l4 4L8 20l-5 1 1-5L17 3z"/></svg> Metinde cümleye, soruda satıra/kaleme tıkla → mavi vurgu</span>
+      <button class="clr" title="Bu pasaj ve sorularındaki tüm mavi işaretleri kaldırır">İşaretleri temizle</button>`;
+    h.querySelector('.clr').addEventListener('click',()=>clearMarks(pi));
+
+    /* SOL PANEL: METİN */
+    const paneP=el('div','pane');
+    paneP.innerHTML=`<div class="pane-tab"><b><svg class="ic" viewBox="0 0 24 24" width="12" height="12"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> METİN</b><span id="mkcnt-${pi}">işaret yok</span></div>`;
+    const bodyP=el('div','pane-body ptext');
+    let k=0;
     P.paras.forEach(par=>{
       const p=el('p');
       par.forEach(s=>{
-        const key=`p${pi}-s${Object.keys(SENT).filter(k=>k.startsWith(`p${pi}-`)).length}`; // altta gerçek id ile span kurulacak
+        const id=`p${pi}-s${k++}`;
         const span=el('span','sent',esc(s)+' ');
+        span.id=id; span.title='Tıklayıp işaretle / kaldır';
+        span.addEventListener('click',()=>toggleMark(id,span,pi));
         p.append(span);
+        SENT[id].node=span;
       });
-      tx.append(p);
+      bodyP.append(p);
     });
-    card.append(h,tx);
-    /* cümle kimliklerini ata */
-    let k=0; tx.querySelectorAll('.sent').forEach(s=>{const id=`p${pi}-s${k++}`; s.id=id; SENT[id].node=s;});
-    QUESTIONS.filter(q=>q.p===pi).forEach(q=>card.append(buildQ(q)));
-    exam.append(card);
+    paneP.append(bodyP);
+
+    /* SAĞ PANEL: SORULAR */
+    const paneQ=el('div','pane');
+    paneQ.innerHTML=`<div class="pane-tab"><b><svg class="ic" viewBox="0 0 24 24" width="12" height="12"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> SORULAR</b><span id="qcnt-${pi}"></span></div>`;
+    const bodyQ=el('div','pane-body');
+    QUESTIONS.filter(q=>q.p===pi).forEach(q=>bodyQ.append(buildQ(q)));
+    paneQ.append(bodyQ);
+
+    split.append(h,paneP,paneQ);
+    exam.append(split);
   });
+
+  /* Kayıtlı mavi işaretleri geri yükle */
+  Object.keys(state.marks).forEach(applyMarkNode);
+  for(let i=0;i<PASSAGES.length;i++)updateTabs(i);
 })();
 
 function buildQ(q){
   const c=CATS[q.cat];
-  const card=el('div','qcard reveal'); card.style.setProperty('--c',c.color); card.id='q'+q.id;
+  const card=el('div','qcard'); card.style.setProperty('--c',c.color); card.id='q'+q.id;
   const top=el('div','qtop');
   top.innerHTML=`<span class="chip">${c.name}</span><span class="qn">SORU ${String(q.id).padStart(2,'0')} / 15</span><span class="pts">${q.opts.length} şık · tek deneme</span>`;
+
+  /* Soru satırı: tıklayınca mavi vurgu */
   const stem=el('p','stem',q.stem);
+  stem.dataset.mk=q.id+'#stem';
+  stem.title='Tıklayıp bu satırı işaretle';
+  stem.addEventListener('click',()=>toggleMark(q.id+'#stem',stem,q.p));
+
   const opts=el('div','opts');
   q.opts.forEach((o,i)=>{
-    const b=el('button','opt');
-    b.innerHTML=`<span class="key">${'ABCDE'[i]}</span><span>${esc(o[0])}</span><span class="mk"><svg class="ic" viewBox="0 0 24 24" width="18" height="18"><polyline points="20 6 9 17 4 12"/></svg></span>`;
-    b.addEventListener('click',()=>pick(q,i));
-    b.dataset.i=i; opts.append(b);
+    const d=el('div','opt'); d.dataset.mk=q.id+'#o'+i;
+    d.innerHTML=`<span class="key">${'ABCDE'[i]}</span><span>${esc(o[0])}</span><span class="mk"></span>
+      <button class="pen" title="Şıkkı işarele / kaldır" aria-label="Şıkkı işaretle"><svg class="ic" viewBox="0 0 24 24" width="13" height="13"><path d="M17 3l4 4L8 20l-5 1 1-5L17 3z"/></svg></button>`;
+    d.addEventListener('click',()=>pick(q,i));
+    d.querySelector('.pen').addEventListener('click',e=>{e.stopPropagation(); toggleMark(q.id+'#o'+i,d,q.p);});
+    opts.append(d);
   });
   card.append(top,stem,opts);
   const fb=el('div','fb'); card.append(fb);
@@ -1037,7 +1152,7 @@ function buildQ(q){
 function pick(q,i){
   if(state.ans[q.id]!==undefined)return;
   state.ans[q.id]=i; save();
-  paintQ(q); updateReport();
+  paintQ(q); updateReport(); updateTabs(q.p);
 }
 
 function paintQ(q){
@@ -1076,23 +1191,30 @@ function paintQ(q){
         <div class="fb-box"><b>Stratejik not</b>${esc(q.strat)}</div>
       </div>
       <div class="fb-act">
-        <button class="btn small evbtn">Kanıtı pasajda işaretle</button>
+        <button class="btn small evbtn">Kanıtı metinde göster</button>
       </div>
     </div>`;
   fb.querySelector('.evbtn').addEventListener('click',evToggle(q,card));
 }
+
+/* Kanıt vurgusu: yalnızca metin panelinin kendi kaydırma alanını oynatır */
+function scrollToSent(sent){
+  const pane=sent.closest('.pane-body');
+  if(!pane)return;
+  const top=sent.getBoundingClientRect().top-pane.getBoundingClientRect().top+pane.scrollTop-70;
+  pane.scrollTo({top:Math.max(0,top),behavior:'smooth'});
+}
 function evToggle(q,card){
   return function(){
     const btn=card.querySelector('.evbtn');
-    const marked=card.closest('.pcard').querySelectorAll('.sent.evid').length>0;
-    card.closest('.pcargd');
+    const wasOn=btn.dataset.on==='1';
     document.querySelectorAll('.sent.evid').forEach(s=>s.classList.remove('evid'));
-    document.querySelectorAll('.evbtn').forEach(b=>{b.textContent='Kanıtı pasajda işaretle';});
-    if(marked){return;}
+    document.querySelectorAll('.evbtn').forEach(b=>{b.dataset.on=''; b.textContent='Kanıtı metinde göster';});
+    if(wasOn)return;
     let first=null;
     q.ev.forEach(id=>{const s=SENT[id].node; if(s){s.classList.add('evid'); if(!first)first=s;}});
-    if(first)first.scrollIntoView({behavior:'smooth',block:'center'});
-    btn.textContent='Vurguyu kaldır';
+    btn.dataset.on='1'; btn.textContent='Vurguyu kaldır';
+    if(first)scrollToSent(first);
   };
 }
 
@@ -1149,7 +1271,9 @@ document.getElementById('confirmYes').addEventListener('click',()=>{
   });
   document.querySelectorAll('.sent.evid').forEach(s=>s.classList.remove('evid'));
   document.getElementById('confirmBox').classList.remove('show');
-  updateReport(); toast('Karne sıfırlandı — taze başlangıçlar');
+  updateReport();
+  for(let i=0;i<PASSAGES.length;i++)updateTabs(i);
+  toast('Karne sıfırlandı — taze başlangıçlar');
   document.getElementById('deneme').scrollIntoView({behavior:'smooth'});
 });
 
